@@ -1,4 +1,4 @@
-const mysql = require('mysql/promise');
+const mysql = require('mysql2/promise');
 async function conectarBD() 
 {
     if (global.conexao && global.conexao.state !== 'disconnected')
@@ -39,3 +39,4 @@ async function buscarUsuario(usuario)
 
     
 }
+    module.exports = {buscarUsuario};

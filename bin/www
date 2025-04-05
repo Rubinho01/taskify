@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('taskify:server');
 var http = require('http');
+global.banco = require('../banco');
 
 /**
  * Get port from environment and store in Express.

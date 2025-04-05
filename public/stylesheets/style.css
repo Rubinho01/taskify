@@ -1,8 +1,29 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+h1 {
+  color: #fff;
 }
 
-a {
-  color: #00B7FF;
+span{
+  color: #fff;
+  padding: 0px 0px 0px 25px;
+}
+
+label{
+  color: #fff;
+  padding: 0px 0px 0px 15px;
+  font-weight: 600;
+}
+
+.btn.submit{
+  background-color: #fff;
+  padding: 14px 100px;
+  border-radius: 50px;
+  font-weight: 700;
+  color: #9C9C9C;
+}
+.btn.submit:hover{
+  background-color: whitesmoke;
+}
+.form-control{
+  padding: 14px 5px;
+  border-radius: 50px;
 }
