@@ -27,3 +27,7 @@ label{
   padding: 14px 5px;
   border-radius: 50px;
 }
+.container {
+  display: flex;
+  height: 100vh; /* Garante que a altura ocupa toda a tela */
+}
