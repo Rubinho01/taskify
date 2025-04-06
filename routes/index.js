@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
 /* GET FORMULARIO DE LOGIN. */
 router.get('/login', function(req, res, next)
 {
-  res.render('loginForm');
+  res.render('loginForm', {erro: null});
 });
 
 /* GET FORMULARIO DE REGISTRO. */
@@ -23,8 +23,9 @@ router.get('/register', function(req, res, next)
 router.get('/boards', function(req, res, next)
 {
   verificarSessão(res);
-  res.render('boards');
+  res.render('boards', {nome: global.usunome});
 });
+
 
 
 
@@ -42,11 +43,12 @@ router.post('/login', async function(req, res ,next)
   {
     global.usucodigo = usuario.usuid;
     global.usuemail = usuario.usuemail;
+    global.usunome = usuario.usunome;
     res.redirect('/boards');
   }
   else
   {
-    res.redirect('/');
+    res.render('loginForm', {erro: 'Credenciais Inválidas!'});
   }
   
 });
@@ -72,4 +74,7 @@ function verificarSessão(res)
   }
 }
 
+
+
+/* ERROS */
 module.exports = router;

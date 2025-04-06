@@ -3,26 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Register Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
 </head>
 <body>
+
+    <div class="container-fluid vh-100 text-start">
+        <div class="row align-items-center" >
+            <div class="col text-center ">
+                <img src="images/logo.png" alt="">
+              </div>
+          <div class="col d-flex flex-column justify-content-center vh-100"  style="background-color: #E91011;">
+            <H1 class="text-center">Register</H1>
+            <form action="/register"  method="post">
+                <div class="mb-3">
+                    <label  class="form-label email">Full Name:</label>
+                    <input type="text" class="form-control text-center" id="nome" name="nome" required placeholder="Plase, Enter your name Here">
+                </div>
+                <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label">E-mail:</label>
+                    <input type="email" class="form-control text-center" id="email" name="email" required placeholder="Please, enter the E-mail here">
+                </div>
+                <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label">Date of Birth:</label>
+                    <input type="date" class="form-control text-center" id="nasc" name="nasc" required placeholder="Please, enter the date of birth here">
+                </div>
+                <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label">Password:</label>
+                    <input type="password" class="form-control text-center" id="senha" name="senha" required placeholder="Please, enter the password here">
+                </div>
+                <div class="mb-3">
+                    <label for="formGroupExampleInput2" class="form-label">Confirm Password:</label>
+                    <input type="password" class="form-control text-center" id="senha" name="" required placeholder="Confirm the password here">
+                </div>
+              <div class="text-center">
+                <button class="btn submit" type="submit">REGISTER</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
 
     <form action="/register"  method="post">
         <div class="mb-3">
             <label  class="form-label email">Name:</label>
-            <input type="name" class="form-control text-center" id="nome" name="nome" placeholder="Plase, Enter E-mail Here">
+            <input required type="name" class="form-control text-center" id="nome" name="nome" placeholder="Plase, Enter E-mail Here">
         </div>
         <div class="mb-3">
             <label for="formGroupExampleInput2" class="form-label">Email:</label>
-            <input type="email" class="form-control text-center" id="email" name="email" placeholder="Please, enter password here">
+            <input required type="email" class="form-control text-center" id="email" name="email" placeholder="Please, enter password here">
         </div>
         <div class="mb-3">
             <label for="formGroupExampleInput2" class="form-label">Date:</label>
-            <input type="date" class="form-control text-center" id="nasc" name="nasc" placeholder="Please, enter password here">
+            <input required type="date" class="form-control text-center" id="nasc" name="nasc" placeholder="Please, enter password here">
         </div>
         <div class="mb-3">
             <label for="formGroupExampleInput2" class="form-label">Password:</label>
-            <input type="password" class="form-control text-center" id="senha" name="senha" placeholder="Please, enter password here">
+            <input required type="password" class="form-control text-center" id="senha" name="senha" placeholder="Please, enter password here">
         </div>
       <span>Sign Up</span>
       <div class="text-center">
