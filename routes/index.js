@@ -8,12 +8,20 @@ router.get('/', function(req, res, next) {
 
 
 /* GET FORMULARIO DE LOGIN. */
-router.get('/login', function(req, res, next){
+router.get('/login', function(req, res, next)
+{
   res.render('loginForm');
 });
 
+/* GET FORMULARIO DE REGISTRO. */
+router.get('/register', function(req, res, next)
+{
+  res.render('registerForm');
+});
+
 /* GET PÁGINA DE QUADROS */
-router.get('/boards', function(req, res, next){
+router.get('/boards', function(req, res, next)
+{
   verificarSessão(res);
   res.render('boards');
 });
@@ -41,6 +49,19 @@ router.post('/login', async function(req, res ,next)
     res.redirect('/');
   }
   
+});
+
+/* POST FORMULARIO DE REGISTRO */
+router.post('/register', async function(req, res, next)
+{
+  const nome = req.body.nome;
+  const email = req.body.email;
+  const nasc = req.body.nasc;
+  const senha = req.body.senha;
+
+  await global.banco.registrarUsuario({nome, email, nasc, senha});
+
+  res.redirect('/login');
 });
 
 function verificarSessão(res)
