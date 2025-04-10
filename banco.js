@@ -43,7 +43,7 @@ async function buscarUsuario(usuario)
 async function registrarUsuario(usuario)
 {
     const conexao = await conectarBD();
-    const sql = "insert into usuario(usunome, usuemail, usunascimento, ususenha) values (?,?,?,?)"
+    const sql = "insert into usuarios(usunome, usuemail, usunascimento, ususenha) values (?,?,?,?)"
     await conexao.query(sql, [usuario.nome, usuario.email, usuario.nasc, usuario.senha]);
 }
 
