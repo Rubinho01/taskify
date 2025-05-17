@@ -59,6 +59,18 @@ async function buscarAdmin(admin){
 
 }
 
+async function contagemDashboard(){
+    const conexao = await conectarBD();
+   const [[counts]] = await conexao.execute(`
+    select 
+      (select count(*) from admin) as totalAdmins,
+      (select count(*) from tarefas) as totalTasks,
+      (select count(*) from quadros) as totalBoards,
+      (select count(*) from usuarios) as totalUsers
+  `);
+    return counts;
+}
+
 async function registrarQuadro(nome, descricao) {
     const conex = await conectarBD();
     const sql = "INSERT INTO quadros(quanome, quadesc) VALUES (?, ?);";
@@ -80,4 +92,4 @@ async function verificarQuadro(quaid, usuid){
     
 }
 
-    module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, RegistrarQuaUsu, verificarQuadro};
+    module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, RegistrarQuaUsu, verificarQuadro, contagemDashboard};
