@@ -63,13 +63,18 @@ router.post('/boards/new', async function (req, res, next)
 
 /*GET QUADRO*/
 router.get('/board/:id', async function(req, res, next) {
-  verificarSessão(res);
-  global.quaid = req.params.id;
-  verificarQuadro(res);
+  const quaid = req.params.id;
+  const verificar = await global.banco.verificarQuadro(quaid, global.usucodigo);
+  console.log(verificar);
+
+  if(!verificar){
+    return res.redirect('/boards');
+  }
   res.render('board');
 
+
   
-})
+});
 
  
 
@@ -118,15 +123,8 @@ function verificarSessão(res)
 {
   if(!global.usucodigo)
   {
-    res.redirect('/');
+    return res.redirect('/');
   }
-}
-async function verificarQuadro(res) {
-  const verificar = await global.banco.verificarQuadro(global.quaid, global.usucodigo);
-  if(!verificar){
-    res.redirect('/boards');
-  }
-  
 }
 
 
