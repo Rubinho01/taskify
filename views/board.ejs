@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tarefas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #fff;
+    }
+
+    .card {
+      background-color: #fb8686;
+      padding: 20px;
+      border-radius: 20px;
+      width: 300px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h2 {
+      background-color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin: 0;
+      font-weight: bold;
+      flex: 1;
+      text-align: center;
+    }
+
+    .header button {
+      background-color: white;
+      border: none;
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      margin-left: 10px;
+    }
+
+    .task {
+      background-color: white;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task label {
+      font-weight: 500;
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>Tarefas</h2>
+      <button>+</button>
+    </div>
+
+    <div class="task">
+      <label for="tarefa1">Primeira Tarefa</label>
+      <input type="checkbox" id="tarefa1" class="checkbox">
+    </div>
+
+    <div class="task">
+      <label for="tarefa2">Segunda Tarefa</label>
+      <input type="checkbox" id="tarefa2" class="checkbox" checked>
+    </div>
+
+    <div class="task">
+      <label for="tarefa3">Terceira Tarefa</label>
+      <input type="checkbox" id="tarefa3" class="checkbox" disabled>
+    </div>
+  </div>
+</body>
+</html>
