@@ -3,7 +3,7 @@ var router = express.Router();
 //Debian
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.render('admLoginForm');
+  res.render('admin/admLoginForm');
 });
 
 router.post('/login', async function (req,res) {
@@ -16,7 +16,7 @@ router.post('/login', async function (req,res) {
     global.admemail = admin.admemail;
     res.redirect('/admin/dashbord');
   }else{
-    res.render('admLoginForm', {erro: 'credenciais inválidas'});
+    res.render('admin/admLoginForm', {erro: 'credenciais inválidas'});
   }
   
 });
