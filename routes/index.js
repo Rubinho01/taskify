@@ -19,12 +19,65 @@ router.get('/register', function(req, res, next)
   res.render('registerForm');
 });
 
+
+
+
 /* GET PÁGINA DE QUADROS */
 router.get('/boards', function(req, res, next)
 {
   verificarSessão(res);
+
   res.render('boards', {nome: global.usunome});
 });
+
+/* GET CRIAR QUADRO */
+router.get('/boards/new', function(req, res, next)
+{
+  verificarSessão(res);
+  
+  res.render('boardForm', {nome: global.usunome, erro : null});
+});
+
+
+/* POST CRIAR QUADRO */
+router.post('/boards/new', async function (req, res, next)
+{
+  verificarSessão(res);
+  const {nomeQuadro, descQuadro} = req.body;
+  
+  if(!nomeQuadro || !descQuadro)
+    {
+      res.redirect('/boards/new', {
+        erro : "preencha todos os campos"
+      });
+    } 
+  
+  else 
+  {
+    const quaid = await global.banco.registrarQuadro(nomeQuadro, descQuadro);
+    await global.banco.RegistrarQuaUsu(quaid, global.usucodigo);
+    res.redirect('/boards');
+  }
+
+});
+
+/*GET QUADRO*/
+router.get('/board/:id', async function(req, res, next) {
+  const quaid = req.params.id;
+  const verificar = await global.banco.verificarQuadro(quaid, global.usucodigo);
+  console.log(verificar);
+
+  if(!verificar){
+    return res.redirect('/boards');
+  }
+  res.render('board');
+
+
+  
+});
+
+ 
+
 
 
 
@@ -70,7 +123,7 @@ function verificarSessão(res)
 {
   if(!global.usucodigo)
   {
-    res.redirect('/');
+    return res.redirect('/');
   }
 }
 
