@@ -1,11 +1,38 @@
 var express = require('express');
 var router = express.Router();
+const { conectarBD, contagemDashboard } = require('../banco');
+
 //Debian
-/* GET users listing. */
+/* GETS */
 router.get('/', function(req, res, next) {
   res.render('admin/admLoginForm');
 });
 
+router.get('/dashboard', async function(req,res){
+  verificaLogin(res);
+
+  const counts = await contagemDashboard();
+ 
+  res.render('admin/dashboard',{
+    nome: global.admnome,
+    totalAdmins: counts.totalAdmins,
+    totalTasks: counts.totalTasks,
+    totalBoards: counts.totalBoards,
+    totalUsers: counts.totalUsers
+  });
+
+
+});
+router.get('/sair', function(req, res){
+  delete global.admid;
+  delete global.admemail;
+  delete global.admnome;
+  res.redirect('/admin')
+});
+
+
+
+/* POSTS */
 router.post('/login', async function (req,res) {
   const email = req.body.email;
   const senha = req.body.senha;
@@ -14,13 +41,23 @@ router.post('/login', async function (req,res) {
   if(admin.admid){
     global.admid = admin.admid;
     global.admemail = admin.admemail;
-    res.redirect('/admin/dashbord');
+    global.admnome = admin.admnome;
+    res.redirect('/admin/dashboard');
   }else{
     res.render('admin/admLoginForm', {erro: 'credenciais inválidas'});
   }
   
 });
 
+
+
+
+
+function verificaLogin(res){
+  if (!global.admemail || global.admemail == ""){
+    res.redirect('/admin')
+  }
+};
 
 
 

@@ -58,4 +58,17 @@ async function buscarAdmin(admin){
     }
 
 }
-    module.exports = {buscarUsuario, registrarUsuario, buscarAdmin};
+
+async function contagemDashboard(){
+    const conexao = await conectarBD();
+   const [[counts]] = await conexao.execute(`
+    select 
+      (select count(*) from admin) as totalAdmins,
+      (select count(*) from tarefas) as totalTasks,
+      (select count(*) from quadros) as totalBoards,
+      (select count(*) from usuarios) as totalUsers
+  `);
+    return counts;
+}
+
+    module.exports = { buscarUsuario, registrarUsuario, buscarAdmin, contagemDashboard };
