@@ -92,4 +92,24 @@ async function verificarQuadro(quaid, usuid){
     
 }
 
-    module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, RegistrarQuaUsu, verificarQuadro, contagemDashboard};
+async function buscarQuadroId(quaid) {
+    const conex = await conectarBD();
+    const sql = "SELECT * FROM quadros where quaid=?;";
+    const [quadro] = await conex.query(sql,[quaid]);
+    return quadro[0];
+
+    
+}
+
+async function buscarQuadrosUsuario(usuid) {
+    const conex = await conectarBD();
+    const sql = `SELECT u.usuid, q.quaid, q.quanome from usuarios u
+    inner join quadros_usuarios qu on u.usuid = qu.usuid
+    inner join quadros q on q.quaid = qu.quaid
+    where u.usuid=?`;
+    const [quadrosUsuario] = await conex.query(sql, [usuid]);
+    return quadrosUsuario;    
+}
+
+    module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
+        RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario};

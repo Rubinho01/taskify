@@ -2,23 +2,60 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tarefas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quadro de Tarefas</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: sans-serif;
       display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar colada na esquerda */
+    .sidebar {
+      width: 140px;
+      background-color: #f8cfd1;
+      padding: 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    }
+
+    .sidebar button {
+      background-color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+      transition: background-color 0.3s;
+    }
+
+    .sidebar button:hover {
+      background-color: #eee;
+    }
+
+    /* Container principal para centralizar o card */
+    .main-content {
+      flex: 1;
+      display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: #fff;
+      padding: 40px;
     }
 
     .card {
       background-color: #fb8686;
       padding: 20px;
       border-radius: 20px;
-      width: 300px;
+      width: 320px;
     }
 
     .header {
@@ -45,6 +82,7 @@
       width: 40px;
       height: 40px;
       margin-left: 10px;
+      font-size: 20px;
     }
 
     .task {
@@ -68,26 +106,43 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <h2>Tarefas</h2>
-      <button>+</button>
-    </div>
 
-    <div class="task">
-      <label for="tarefa1">Primeira Tarefa</label>
-      <input type="checkbox" id="tarefa1" class="checkbox">
-    </div>
+  <div class="sidebar">
+    <% quadrosUsuario.forEach(q => { %>
+      <a href="/board/<%= q.quaid %>">
+      <button><%= q.quanome %></button>
+      </a>
+    <% }); %>
+    
+    <button>Quadro #2</button>
+    <button>Quadro #3</button>
+  </div>
 
-    <div class="task">
-      <label for="tarefa2">Segunda Tarefa</label>
-      <input type="checkbox" id="tarefa2" class="checkbox" checked>
-    </div>
+  <div class="main-content">
+    <div class="card">
+      <div class="header">
+        <h2><%= quadro.quanome %></h2>
+        <a href="/board/<%= quadro.quaid %>/new-task">
+        <button>+</button>
+        </a>
+      </div>
 
-    <div class="task">
-      <label for="tarefa3">Terceira Tarefa</label>
-      <input type="checkbox" id="tarefa3" class="checkbox" disabled>
+      <div class="task">
+        <label for="tarefa1">Primeira Tarefa</label>
+        <input type="checkbox" id="tarefa1" class="checkbox">
+      </div>
+
+      <div class="task">
+        <label for="tarefa2">Segunda Tarefa</label>
+        <input type="checkbox" id="tarefa2" class="checkbox" checked>
+      </div>
+
+      <div class="task">
+        <label for="tarefa3">Terceira Tarefa</label>
+        <input type="checkbox" id="tarefa3" class="checkbox" disabled>
+      </div>
     </div>
   </div>
+
 </body>
 </html>
