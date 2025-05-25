@@ -1,148 +1,126 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quadro de Tarefas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+
+    .navbar-custom {
+      background-color: #e50914; /* vermelho Netflix style */
+      padding: 0.5rem 1rem;
+    }
+
+    .nav-icon {
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border-radius: 10px;
+      padding: 5px;
+    }
+
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      background-color: black;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .form-control {
+      border-radius: 10px;
+    }
+
+    .nav-link {
+      color: black !important;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      text-decoration: underline;
     }
 
     body {
       font-family: sans-serif;
-      display: flex;
       min-height: 100vh;
     }
-
-    /* Sidebar colada na esquerda */
     .sidebar {
-      width: 140px;
       background-color: #f8cfd1;
-      padding: 20px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      min-height: 100vh;
       box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     }
-
-    .sidebar button {
-      background-color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px;
-      cursor: pointer;
+    .sidebar .btn {
       box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
-      transition: background-color 0.3s;
     }
-
-    .sidebar button:hover {
-      background-color: #eee;
-    }
-
-    /* Container principal para centralizar o card */
-    .main-content {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-    }
-
-    .card {
+    .main-card {
       background-color: #fb8686;
-      padding: 20px;
-      border-radius: 20px;
-      width: 320px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .header h2 {
-      background-color: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      margin: 0;
-      font-weight: bold;
-      flex: 1;
-      text-align: center;
-    }
-
-    .header button {
-      background-color: white;
-      border: none;
-      border-radius: 12px;
-      width: 40px;
-      height: 40px;
-      margin-left: 10px;
-      font-size: 20px;
-    }
-
-    .task {
-      background-color: white;
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .task label {
-      font-weight: 500;
-    }
-
-    .checkbox {
-      width: 20px;
-      height: 20px;
     }
   </style>
 </head>
 <body>
 
-  <div class="sidebar">
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom d-flex justify-content-between align-items-center">
+    
+    <div class="d-flex align-items-center gap-3">
+      <img src="/images/logo.png" alt="Logo Morango" class="nav-icon">
+      <a class="nav-link" href="/boards"><i class="bi bi-chevron-right"></i> Home</a>
+      <a class="nav-link" href="#"><i class="bi bi-chevron-right"></i> Recent</a>
+      <a class="nav-link" href="#"><i class="bi bi-chevron-right"></i> Favorites</a>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control border-start-0" placeholder="Search">
+      </div>
+      <div class="profile-icon">
+        <i class="bi bi-person-fill"></i>
+      </div>
+    </div>
+
+  </nav>
+   <!-- /NAVBAR -->
+
+
+  <div class="d-flex" style="min-height: calc(100vh - 56px);"> <!-- 56px = altura aproximada da navbar -->
+  
+  <!-- Sidebar -->
+  <div class="sidebar d-flex flex-column p-3 gap-2" style="width: 140px;">
     <% quadrosUsuario.forEach(q => { %>
-      <a href="/board/<%= q.quaid %>">
-      <button><%= q.quanome %></button>
+      <a href="/board/<%= q.quaid %>" class="text-decoration-none">
+        <button class="btn btn-light w-100 rounded-3"><%= q.quanome %></button>
       </a>
     <% }); %>
-    
-    <button>Quadro #2</button>
-    <button>Quadro #3</button>
   </div>
 
-  <div class="main-content">
-    <div class="card">
-      <div class="header">
-        <h2><%= quadro.quanome %></h2>
+   <!-- MAIN -->
+  <div class="flex-fill d-flex justify-content-center align-items-center p-4">
+    <div class="card main-card p-4 rounded-4" style="width: 320px;">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="bg-white text-center flex-grow-1 p-2 rounded-3 m-0 fw-bold"><%= quadro.quanome %></h2>
         <a href="/board/<%= quadro.quaid %>/new-task">
-        <button>+</button>
+          <button class="btn btn-light ms-2 rounded-circle" style="width: 40px; height: 40px; font-size: 20px;">+</button>
         </a>
       </div>
-
-      <div class="task">
-        <label for="tarefa1">Primeira Tarefa</label>
-        <input type="checkbox" id="tarefa1" class="checkbox">
+      <% tarefas.forEach(t => { %>
+      <div class="bg-white rounded-3 p-2 mb-2 d-flex justify-content-between align-items-center">
+        <label class="fw-medium" for="tarefa1"><%= t.tarnome %></label>
+        <input type="checkbox" id="tarefa1" class="form-check-input" <%= t.tarstatus === 1 ? 'checked disabled' : 'disabled' %>>
       </div>
-
-      <div class="task">
-        <label for="tarefa2">Segunda Tarefa</label>
-        <input type="checkbox" id="tarefa2" class="checkbox" checked>
-      </div>
-
-      <div class="task">
-        <label for="tarefa3">Terceira Tarefa</label>
-        <input type="checkbox" id="tarefa3" class="checkbox" disabled>
-      </div>
+      <% }); %>
     </div>
   </div>
 
+</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

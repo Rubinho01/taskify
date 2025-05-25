@@ -111,5 +111,24 @@ async function buscarQuadrosUsuario(usuid) {
     return quadrosUsuario;    
 }
 
+async function registrarTarefa(tarnome,tardesc,quaid) {
+    const conex = await conectarBD();
+    const sql = "INSERT INTO tarefas(tarnome,tardesc,tarqua) VALUES (?,?,?)"
+    await conex.query(sql,[tarnome,tardesc,quaid]);
+
+}
+
+async function buscarTarefasQuadro(tarqua) {
+    const conex = await conectarBD();
+    const sql = "select * from tarefas where tarqua=?";
+    const [tarefasQuadro] = await conex.query(sql,[tarqua]);
+    if (tarefasQuadro) return tarefasQuadro;
+    else return {};
+}
+
+
+
     module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
-        RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario};
+        RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
+        registrarTarefa, buscarTarefasQuadro
+    };

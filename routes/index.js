@@ -19,6 +19,47 @@ router.get('/register', function(req, res, next)
   res.render('registerForm');
 });
 
+/* POST FORMULARIO DE LOGIN */
+router.post('/login', async function(req, res ,next) 
+{
+  const email = req.body.email;
+  const senha = req.body.senha;
+
+  const usuario = await global.banco.buscarUsuario({email, senha});
+  console.log(usuario);
+
+
+  if (usuario.usuid)
+  {
+    global.usucodigo = usuario.usuid;
+    global.usuemail = usuario.usuemail;
+    global.usunome = usuario.usunome;
+    res.redirect('/boards');
+  }
+  else
+  {
+    res.render('loginForm', {erro: 'Credenciais Inválidas!'});
+  }
+  
+});
+
+/* POST FORMULARIO DE REGISTRO */
+router.post('/register', async function(req, res, next)
+{
+  const nome = req.body.nome;
+  const email = req.body.email;
+  const nasc = req.body.nasc;
+  const senha = req.body.senha;
+
+  await global.banco.registrarUsuario({nome, email, nasc, senha});
+
+  res.redirect('/login');
+});
+
+
+
+
+
 
 
 
@@ -61,60 +102,43 @@ router.post('/boards/new', async function (req, res, next)
 
 });
 
+
 /*GET QUADRO*/
 router.get('/board/:id', async function(req, res, next) {
   const quaid = parseInt(req.params.id);
   verificarQuadro(quaid, global.usucodigo, res);
-  const quadro = await global.banco.buscarQuadroId(quaid);
+  global.quadro = await global.banco.buscarQuadroId(quaid);
   console.log(quadro);
   const quadrosUsuario = await global.banco.buscarQuadrosUsuario(global.usucodigo);
   console.log(quadrosUsuario);
-  return res.render('board',{quadro, quadrosUsuario});
+  const tarefas = await global.banco.buscarTarefasQuadro(quaid);
+  console.log("TAREFAS:");
+  console.log(tarefas);
+  return res.render('board',{quadro, quadrosUsuario, tarefas});
 });
+
+/*GET NOVA TAREFA*/
+router.get('/board/:id/new-task', async function(req, res, next)
+ {
+   const quaid = parseInt(req.params.id);
+   console.log('ENTROU EM TAFERA');
+   return res.render('taskForm',{quaid});
+})
+
+router.post('/board/:id/new-task', async function (req,res,next)
+{
+  const quaid = parseInt(req.params.id);
+  const {tarnome, tardesc} = req.body;
+  console.log("ID recebido:", req.params.id);
+  await global.banco.registrarTarefa(tarnome,tardesc,quaid);
+  res.redirect(`/board/${quaid}`);
+
+  
+})
+
+
 
  
-
-
-
-
-
-/* POST FORMULARIO DE LOGIN */
-router.post('/login', async function(req, res ,next) 
-{
-  const email = req.body.email;
-  const senha = req.body.senha;
-
-  const usuario = await global.banco.buscarUsuario({email, senha});
-  console.log(usuario);
-
-
-  if (usuario.usuid)
-  {
-    global.usucodigo = usuario.usuid;
-    global.usuemail = usuario.usuemail;
-    global.usunome = usuario.usunome;
-    res.redirect('/boards');
-  }
-  else
-  {
-    res.render('loginForm', {erro: 'Credenciais Inválidas!'});
-  }
-  
-});
-
-/* POST FORMULARIO DE REGISTRO */
-router.post('/register', async function(req, res, next)
-{
-  const nome = req.body.nome;
-  const email = req.body.email;
-  const nasc = req.body.nasc;
-  const senha = req.body.senha;
-
-  await global.banco.registrarUsuario({nome, email, nasc, senha});
-
-  res.redirect('/login');
-});
-
 function verificarSessão(res)
 {
   if(!global.usucodigo)
