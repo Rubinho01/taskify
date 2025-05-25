@@ -126,9 +126,24 @@ async function buscarTarefasQuadro(tarqua) {
     else return {};
 }
 
+async function buscarTarefaDoQuadro(quaid, tarid){
+    const conex = await conectarBD();
+    const sql = "SELECT * FROM tarefas WHERE tarqua=? and tarid=?";
+    const [tarefa] = await conex.query(sql,[quaid, tarid]);
+    if(tarefa) return tarefa[0];
+    else return {};
+    
+}
+
+async function atualizarStatusTarefa(tarstatus, tarid) {
+    const conex = await conectarBD();
+    const sql = "UPDATE Tarefas SET tarstatus=? where tarid=?";
+    await conex.query(sql,[tarstatus, tarid]);   
+}
+
 
 
     module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
-        registrarTarefa, buscarTarefasQuadro
+        registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa
     };

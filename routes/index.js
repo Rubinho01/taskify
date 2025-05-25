@@ -125,6 +125,7 @@ router.get('/board/:id/new-task', async function(req, res, next)
    return res.render('taskForm',{quaid});
 })
 
+/*POST NOVA TAREFA*/
 router.post('/board/:id/new-task', async function (req,res,next)
 {
   const quaid = parseInt(req.params.id);
@@ -137,6 +138,29 @@ router.post('/board/:id/new-task', async function (req,res,next)
 })
 
 
+
+/*GET TAREFA*/
+router.get('/board/:quaid/task/:tarid', async function (req, res, next)
+{
+  verificarSessão(res);
+  const {quaid, tarid} = req.params;
+  verificarQuadro(quaid, global.usucodigo, res);
+  
+  //VERIFICAR TAREFA
+  const tarefa = await global.banco.buscarTarefaDoQuadro(quaid, tarid);
+  if (!tarefa) res.redirect('/boards');
+
+  res.render('task', {tarefa, quaid});
+})
+
+router.post('/task/:id/tarstauts', async function(req, res)
+{
+  const tarid = parseInt(req.params.id);
+  const newStatus = parseInt(req.body.newStatus);
+
+  await banco.atualizarStatusTarefa(newStatus, tarid);
+  res.redirect('back');
+});
 
  
 function verificarSessão(res)
