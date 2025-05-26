@@ -40,11 +40,11 @@ async function buscarUsuario(usuario)
     
 }
 
-async function registrarUsuario(usuario)
-{
-    const conexao = await conectarBD();
-    const sql = "insert into usuarios(usunome, usuemail, usunascimento, ususenha) values (?,?,?,?);"
-    await conexao.query(sql, [usuario.nome, usuario.email, usuario.nasc, usuario.senha]);
+async function registrarUsuario(usuario) {
+  await conexao.query(
+    'insert into usuarios(usunome,usuemail,usunascimento,ususenha) values (?,?,?,?)',
+    [usuario.usunome, usuario.usuemail, usuario.usunascimento, usuario.ususenha]
+  );
 }
 
 async function buscarAdmin(admin){
@@ -57,7 +57,7 @@ async function buscarAdmin(admin){
         return{};
     }
 
-}
+};
 
 async function contagemDashboard(){
     const conexao = await conectarBD();
@@ -69,8 +69,54 @@ async function contagemDashboard(){
       (select count(*) from usuarios) as totalUsers
   `);
     return counts;
+};
+
+async function listarAdmin(){
+    const conexao = await conectarBD();
+    const [lista] = await conexao.query("select * from admin");
+    return lista;
 }
 
+async function adicionarAdmin(admin){
+    const conexao = await conectarBD();
+    const sql = "Insert into admin (admnome,admemail,admsenha) values (?,?,?)";
+    await conexao.query(sql,[admin.nome, admin.email, admin.senha]);
+}
+
+async function removerAdmin(id){
+    const conexao = await conectarBD();
+    const sql = "delete from admin where admid = ?";
+    await conexao.query(sql,[id]);
+
+}
+
+
+async function admin_listarUsuarios(){
+    const conexao = await conectarBD();
+    const [lista] = await conexao.query("select * from usuarios");
+    return lista;
+}
+
+
+async function admin_removerUsuarios(id){
+    const conexao = await conectarBD();
+    const sql = "delete from usuarios where usuid = ?";
+    await conexao.query(sql,[id]);
+}
+
+async function admin_listarQuadros(){
+    const conexao = await conectarBD();
+    const [lista] = await conexao.query("select * from quadros");
+    return lista;
+}
+
+
+async function admin_removerQuadros(id){
+    const conexao = await conectarBD();
+    const sql = "delete from quadros where usuid = ?";
+    await conexao.query(sql,[id]);
+}
+   
 async function registrarQuadro(nome, descricao) {
     const conex = await conectarBD();
     const sql = "INSERT INTO quadros(quanome, quadesc) VALUES (?, ?);";
@@ -145,5 +191,6 @@ async function atualizarStatusTarefa(tarstatus, tarid) {
 
     module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
-        registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa
+        registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
+        adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin
     };
