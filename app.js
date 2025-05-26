@@ -8,6 +8,8 @@ var indexRouter = require('./routes/index');
 var adminRouter = require('./routes/admin');
 
 
+
+
 var app = express();
 
 // view engine setup
@@ -21,7 +23,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/admin', adminRouter);
+app.use('/admin', (req, res, next) => {
+  console.log('Chegou em /admin');
+  next();
+}, adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
