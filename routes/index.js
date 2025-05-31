@@ -1,5 +1,17 @@
 var express = require('express');
 var router = express.Router();
+const { conectarBD } = require('../banco');
+
+function verificarSessão(res)
+{
+  if(!global.usucodigo)
+  {
+    return res.redirect('/');
+  }
+}
+
+
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -58,37 +70,39 @@ router.post('/register', async function(req, res, next)
 
 
 
-
-
-
-
-
-/* GET PÁGINA DE QUADROS */
-router.get('/boards', function(req, res, next)
-{
-  verificarSessão(res);
-
-  res.render('boards', {nome: global.usunome});
+router.get('/boards', async function (req, res){
+  const usuid = global.usucodigo;
+  const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
+  console.log(quadrosUsuario);
+  res.render('boards', { 
+    nome: global.usunome,
+    quadrosUsuario, quadro: null });
 });
 
 /* GET CRIAR QUADRO */
-router.get('/boards/new', function(req, res, next)
+router.get('/boards/new', async function(req, res, next)
 {
-  verificarSessão(res);
+
+  const quadrosUsuario = await global.banco.buscarQuadrosUsuario(global.usucodigo);
   
-  res.render('boardForm', {nome: global.usunome, erro : null});
+  res.render('boardForm', {
+    nome: global.usunome,
+    quadrosUsuario,
+    erro: null
+  });
 });
+
 
 
 /* POST CRIAR QUADRO */
 router.post('/boards/new', async function (req, res, next)
 {
-  verificarSessão(res);
   const {nomeQuadro, descQuadro} = req.body;
   
   if(!nomeQuadro || !descQuadro)
     {
-      res.redirect('/boards/new', {
+      res.render('/boards/new', {
+        nome: global.usunome,
         erro : "preencha todos os campos"
       });
     } 
@@ -114,7 +128,7 @@ router.get('/board/:id', async function(req, res, next) {
   const tarefas = await global.banco.buscarTarefasQuadro(quaid);
   console.log("TAREFAS:");
   console.log(tarefas);
-  return res.render('board',{quadro, quadrosUsuario, tarefas});
+  return res.render('board',{nome: global.usunome, quadro, quadrosUsuario, tarefas});
 });
 
 /*GET NOVA TAREFA*/
@@ -126,23 +140,19 @@ router.get('/board/:id/new-task', async function(req, res, next)
 })
 
 /*POST NOVA TAREFA*/
-router.post('/board/:id/new-task', async function (req,res,next)
-{
+router.post('/board/:id/new-task', async function (req, res, next) {
   const quaid = parseInt(req.params.id);
-  const {tarnome, tardesc} = req.body;
-  console.log("ID recebido:", req.params.id);
-  await global.banco.registrarTarefa(tarnome,tardesc,quaid);
+  const { tarnome, tardesc } = req.body;
+  const tarusu = global.usucodigo;
+  await global.banco.registrarTarefa(tarnome, tardesc, quaid, tarusu);
   res.redirect(`/board/${quaid}`);
-
-  
-})
+});
 
 
 
 /*GET TAREFA*/
 router.get('/board/:quaid/task/:tarid', async function (req, res, next)
 {
-  verificarSessão(res);
   const {quaid, tarid} = req.params;
   verificarQuadro(quaid, global.usucodigo, res);
   
@@ -150,7 +160,7 @@ router.get('/board/:quaid/task/:tarid', async function (req, res, next)
   const tarefa = await global.banco.buscarTarefaDoQuadro(quaid, tarid);
   if (!tarefa) res.redirect('/boards');
 
-  res.render('task', {tarefa, quaid});
+  res.render('task', {nome: usunome, tarefa, quaid});
 })
 
 router.post('/task/:id/tarstauts', async function(req, res)
@@ -162,16 +172,7 @@ router.post('/task/:id/tarstauts', async function(req, res)
   res.redirect('back');
 });
 
- 
-function verificarSessão(res)
-{
-  if(!global.usucodigo)
-  {
-    return res.redirect('/');
-  }
-}
-
-async function verificarQuadro(quadro, usuario, res) {
+ async function verificarQuadro(quadro, usuario, res) {
   const verificar = await global.banco.verificarQuadro(quadro, usuario);
     if(!verificar){
     return res.redirect('/boards');
@@ -179,6 +180,22 @@ async function verificarQuadro(quadro, usuario, res) {
   
 }
 
+router.get('/dashboard', async function(req, res) {
+  const usuid = global.usucodigo;
+  const contagem = await global.banco.contagemDashboardUsuario(usuid);
 
+  res.render('dashboard', {
+    nome: global.usunome,
+    totalQuadros: contagem.totalQuadros,
+    totalTarefas: contagem.totalTarefas
+  });
+});
+
+router.get('/sair', async function(req, res) {
+  delete global.usucodigo
+  delete global.usuemail
+  delete global.usunome
+  res.redirect('/');
+});
 /* ERROS */
 module.exports = router;

@@ -41,10 +41,10 @@ async function buscarUsuario(usuario)
 }
 
 async function registrarUsuario(usuario) {
-  await conexao.query(
-    'insert into usuarios(usunome,usuemail,usunascimento,ususenha) values (?,?,?,?)',
-    [usuario.usunome, usuario.usuemail, usuario.usunascimento, usuario.ususenha]
-  );
+  const conexao = await conectarBD()
+  const sql = 'insert into usuarios(usunome,usuemail,usunascimento,ususenha) values (?,?,?,?)';
+    await conexao.execute(sql,[usuario.nome,usuario.email,usuario.nasc, usuario.senha])
+  
 }
 
 async function buscarAdmin(admin){
@@ -99,10 +99,18 @@ async function admin_listarUsuarios(){
 
 
 async function admin_removerUsuarios(id){
-    const conexao = await conectarBD();
-    const sql = "delete from usuarios where usuid = ?";
-    await conexao.query(sql,[id]);
+  const conexao = await conectarBD();
+
+  const sql0 = "DELETE FROM tarefas WHERE tarusu = ?";
+  await conexao.query(sql0, [id]);
+
+  const sql1 = "DELETE FROM quadros_usuarios WHERE usuid = ?";
+  await conexao.query(sql1, [id]);
+
+  const sql2 = "DELETE FROM usuarios WHERE usuid = ?";
+  await conexao.query(sql2, [id]);
 }
+
 
 async function admin_listarQuadros(){
     const conexao = await conectarBD();
@@ -111,10 +119,14 @@ async function admin_listarQuadros(){
 }
 
 
-async function admin_removerQuadros(id){
-    const conexao = await conectarBD();
-    const sql = "delete from quadros where usuid = ?";
-    await conexao.query(sql,[id]);
+async function admin_removerQuadros(quaid) {
+  const conexao = await conectarBD();
+
+  const sql1 = 'DELETE FROM quadros_usuarios WHERE quaid = ?';
+  await conexao.query(sql1, [quaid]);
+
+  const sql2 = 'DELETE FROM quadros WHERE quaid = ?';
+  await conexao.query(sql2, [quaid]);
 }
    
 async function registrarQuadro(nome, descricao) {
@@ -157,10 +169,10 @@ async function buscarQuadrosUsuario(usuid) {
     return quadrosUsuario;    
 }
 
-async function registrarTarefa(tarnome,tardesc,quaid) {
+async function registrarTarefa(tarnome,tardesc,quaid,tarusu) {
     const conex = await conectarBD();
-    const sql = "INSERT INTO tarefas(tarnome,tardesc,tarqua) VALUES (?,?,?)"
-    await conex.query(sql,[tarnome,tardesc,quaid]);
+    const sql = "INSERT INTO tarefas(tarnome,tardesc,tarqua,tarusu) VALUES (?,?,?,?)"
+    await conex.query(sql,[tarnome,tardesc,quaid,tarusu]);
 
 }
 
@@ -187,10 +199,61 @@ async function atualizarStatusTarefa(tarstatus, tarid) {
     await conex.query(sql,[tarstatus, tarid]);   
 }
 
+async function buscarQuadrosDoUsuario(usuid) {
+  const sql = `
+    SELECT q.quaid, q.quanome, q.quadesc, t.tarid, t.tarnome, t.tarstatus
+    FROM quadros_usuarios qu
+    JOIN quadros q ON qu.quaid = q.quaid
+    LEFT JOIN tarefas t ON q.quaid = t.tarqua
+    WHERE qu.usuid = ?
+    ORDER BY q.quaid, t.tarid;
+  `;
+
+  const conexao = await conectarBD();
+  const [rows] = await conexao.execute(sql, [usuid]);
+
+  const quadros = new Map();
+
+  for (const item of rows) {
+    if (!quadros.has(item.quaid)) {
+      quadros.set(item.quaid, {
+        id: item.quaid,
+        nome: item.quanome,
+        descricao: item.quadesc,
+        tarefas: []
+      });
+    }
+
+    if (item.tarid) {
+      quadros.get(item.quaid).tarefas.push({
+        id: item.tarid,
+        nome: item.tarnome,
+        status: item.tarstatus
+      });
+    }
+  }
+
+  return Array.from(quadros.values());
+}
+async function contagemDashboardUsuario(usuid){
+    const conexao = await conectarBD();
+
+    const [[{totalQuadros}]] = await conexao.execute(`
+    SELECT COUNT(DISTINCT quaid) AS totalQuadros 
+    FROM quadros_usuarios WHERE usuid = ?`, [usuid]);
+
+    const [[{totalTarefas}]] = await conexao.execute(`SELECT COUNT(t.tarid) AS totalTarefas
+        from tarefas t inner join quadros_usuarios qu on t.tarqua = qu.quaid where qu.usuid=?`, [usuid])
 
 
-    module.exports = {buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
+    return {totalQuadros, totalTarefas};
+
+}
+
+
+    module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
-        adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin
+        adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
+        contagemDashboardUsuario
     };
