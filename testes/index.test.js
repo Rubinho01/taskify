@@ -1,6 +1,5 @@
 const banco = require('../banco');
 
-// Mock da função de conexão
 jest.mock('mysql2/promise', () => ({
   createConnection: jest.fn().mockResolvedValue({
     query: jest.fn(),
@@ -208,7 +207,7 @@ test('atualizarStatusTarefa atualiza o status da tarefa', async() =>{
 
 
 
-})
+});
 
 
 

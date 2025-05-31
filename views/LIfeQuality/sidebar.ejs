@@ -1,0 +1,76 @@
+<style>
+  aside {
+    width: 240px;
+    background-color: #fff6f6;
+    border-right: 1px solid #f1cfcf;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+  }
+  aside h2 { font-size: 18px; color: #e61313; margin-bottom: 10px; }
+  aside .menu, aside .boards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  aside .menu button, aside .boards div {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.2s;
+    border: none;
+    background: none;
+    text-align: left;
+  }
+  aside .menu button:hover, aside .boards div:hover {
+    background-color: #ffeaea;
+  }
+  .active {
+    background-color: #e61313;
+    color: white;
+    font-weight: bold;
+  }
+</style>
+
+<aside>
+  <h2>Logo TaskiFy</h2>
+  <div class="menu">
+    <button 
+      onclick="location.href='/dashboard'" 
+      class="<%= (!quadro || !quadro.id) ? 'active' : '' %>" 
+      style="width: 100%; text-align: left;"
+    >
+      🏠 Dashboard
+    </button>
+
+    <% if (quadrosUsuario && quadrosUsuario.length > 0) { %>
+      <% quadrosUsuario.forEach(q => { %>
+        <button 
+          onclick="location.href='/board/<%= q.id %>'"
+          class="<%= (quadro && quadro.id === q.id) ? 'active' : '' %>"
+        >
+          <%= q.nome %>
+        </button>
+      <% }) %>
+    <% } else { %>
+      <p style="color: #777;">Nenhum quadro disponível</p>
+    <% } %>
+
+    <button class="add-board-btn" onclick="location.href='/boards/new'">
+      <%= quadrosUsuario && quadrosUsuario.length > 0 ? '+ Criar novo quadro' : '+ Criar seu primeiro quadro' %>
+    </button>
+  </div>
+  <div>
+    <h2>Quadros Recentes</h2>
+    <div class="boards">
+      <% if (quadro && quadro.nome) { %>
+        <div class="active"><%= quadro.nome %></div>
+      <% } else { %>
+        <p style="color: #777;">Nenhum quadro selecionado</p>
+      <% } %>
+    </div>
+  </div>
+</aside>
