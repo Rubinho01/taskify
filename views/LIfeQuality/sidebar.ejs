@@ -56,20 +56,20 @@
         </button>
       <% }) %>
     <% } else { %>
-      <p style="color: #777;">Nenhum quadro disponível</p>
+      <p style="color: #777;">No boards available.</p>
     <% } %>
 
     <button class="add-board-btn" onclick="location.href='/boards/new'">
-      <%= quadrosUsuario && quadrosUsuario.length > 0 ? '+ Criar novo quadro' : '+ Criar seu primeiro quadro' %>
+      <%= quadrosUsuario && quadrosUsuario.length > 0 ? '+ Create a new board' : '+ Create your first board!' %>
     </button>
   </div>
   <div>
-    <h2>Quadros Recentes</h2>
+    <h2>Recent</h2>
     <div class="boards">
       <% if (quadro && quadro.nome) { %>
         <div class="active"><%= quadro.nome %></div>
       <% } else { %>
-        <p style="color: #777;">Nenhum quadro selecionado</p>
+        <p style="color: #777;">No boards selected</p>
       <% } %>
     </div>
   </div>

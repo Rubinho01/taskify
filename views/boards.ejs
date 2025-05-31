@@ -141,7 +141,7 @@
             <% quadro.tarefas.forEach(function(tarefa) { %>
               <div class="task-card">
                 <div class="card-content">
-                  <input type="checkbox" <%= tarefa.status === 'concluída' ? 'checked' : '' %> disabled>
+                  <input type="checkbox" <%= tarefa.status === 1  ? 'checked' : '' %> disabled>
                   <label><%= tarefa.nome %></label>
                 </div>
               </div>

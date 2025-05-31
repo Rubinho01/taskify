@@ -114,7 +114,7 @@
   </div>
 
   <% if (tarefas.length === 0) { %>
-    <p>Nenhuma tarefa cadastrada neste quadro.</p>
+    <p>No tasks registered.</p>
   <% } else { %>
     <% tarefas.forEach(t => { %>
       <a href="/board/<%= quadro.quaid %>/task/<%= t.tarid %>" class="task-item">
