@@ -1,14 +1,5 @@
 var express = require('express');
 var router = express.Router();
-const { conectarBD } = require('../banco');
-
-function verificarSessão(res)
-{
-  if(!global.usucodigo)
-  {
-    return res.redirect('/');
-  }
-}
 
 
 
@@ -70,7 +61,7 @@ router.post('/register', async function(req, res, next)
 
 
 
-router.get('/boards', async function (req, res){
+router.get('/boards', verificarSessao, async function (req, res){
   const usuid = global.usucodigo;
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   console.log(quadrosUsuario);
@@ -80,7 +71,7 @@ router.get('/boards', async function (req, res){
 });
 
 /* GET CRIAR QUADRO */
-router.get('/boards/new', async function(req, res, next)
+router.get('/boards/new', verificarSessao, async function(req, res, next)
 {
 
   const quadrosUsuario = await global.banco.buscarQuadrosUsuario(global.usucodigo);
@@ -118,7 +109,7 @@ router.post('/boards/new', async function (req, res, next)
 
 
 /*GET QUADRO*/
-router.get('/board/:id', async function(req, res, next) {
+router.get('/board/:id', verificarSessao, async function(req, res, next) {
   const quaid = parseInt(req.params.id);
   verificarQuadro(quaid, global.usucodigo, res);
   global.quadro = await global.banco.buscarQuadroId(quaid);
@@ -140,7 +131,7 @@ router.get('/board/:id/new-task', async function(req, res, next)
 })
 
 /*POST NOVA TAREFA*/
-router.post('/board/:id/new-task', async function (req, res, next) {
+router.post('/board/:id/new-task', verificarSessao, async function (req, res, next) {
   const quaid = parseInt(req.params.id);
   const { tarnome, tardesc } = req.body;
   const tarusu = global.usucodigo;
@@ -151,7 +142,7 @@ router.post('/board/:id/new-task', async function (req, res, next) {
 
 
 /*GET TAREFA*/
-router.get('/board/:quaid/task/:tarid', async function (req, res, next)
+router.get('/board/:quaid/task/:tarid', verificarSessao, async function (req, res, next)
 {
   const {quaid, tarid} = req.params;
   verificarQuadro(quaid, global.usucodigo, res);
@@ -172,15 +163,9 @@ router.post('/task/:id/tarstauts', async function(req, res)
   res.redirect('back');
 });
 
- async function verificarQuadro(quadro, usuario, res) {
-  const verificar = await global.banco.verificarQuadro(quadro, usuario);
-    if(!verificar){
-    return res.redirect('/boards');
-  }
-  
-}
 
-router.get('/dashboard', async function(req, res) {
+
+router.get('/dashboard', verificarSessao, async function(req, res) {
   const usuid = global.usucodigo;
   const contagem = await global.banco.contagemDashboardUsuario(usuid);
 
@@ -191,11 +176,30 @@ router.get('/dashboard', async function(req, res) {
   });
 });
 
-router.get('/sair', async function(req, res) {
+router.get('/sair', verificarSessao, async function(req, res) {
   delete global.usucodigo
   delete global.usuemail
   delete global.usunome
   res.redirect('/');
 });
+
+
+//MIDDLEWARES
+function verificarSessao(req, res, next) {
+  if (!global.usucodigo) {
+    return res.redirect('/');
+  }
+  next();
+}
+
+ async function verificarQuadro(quadro, usuario, res) {
+  const verificar = await global.banco.verificarQuadro(quadro, usuario);
+    if(!verificar){
+    return res.redirect('/boards');
+  }
+  
+}
+
+
 /* ERROS */
 module.exports = router;
