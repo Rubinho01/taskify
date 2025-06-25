@@ -66,8 +66,7 @@ router.get('/boards', verificarSessao, async function (req, res){
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   console.log(quadrosUsuario);
   res.render('boards', { 
-    nome: global.usunome,
-    quadrosUsuario, quadro: null });
+    nome: global.usunome, quadrosUsuario, quadro: null });
 });
 
 /* GET CRIAR QUADRO */
@@ -183,6 +182,13 @@ router.get('/sair', verificarSessao, async function(req, res) {
   res.redirect('/');
 });
 
+router.get('/profile/:id', verificarSessao, async function(req, res, next) {
+  const usuid = parseInt(req.params.id);
+  const usuario = await global.banco.buscarUsuarioPorId(usuid);
+  const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
+  if(usuario)
+    return res.render('profile', {usuario, quadrosUsuario, nome: global.usunome, quadro:null});
+});
 
 //MIDDLEWARES
 function verificarSessao(req, res, next) {
