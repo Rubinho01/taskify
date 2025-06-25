@@ -235,6 +235,15 @@ async function buscarQuadrosDoUsuario(usuid) {
 
   return Array.from(quadros.values());
 }
+
+async function buscarUsuarioPorId(id) {
+    const conex = await conectarBD();
+    const sql = "SELECT * FROM usuarios where usuid=?;";
+    const [usuario] = await conex.query(sql, [id]);
+    if(usuario) return usuario[0];
+    else {};
+    
+}
 async function contagemDashboardUsuario(usuid){
     const conexao = await conectarBD();
 
@@ -255,5 +264,5 @@ async function contagemDashboardUsuario(usuid){
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
-        contagemDashboardUsuario
+        contagemDashboardUsuario, buscarUsuarioPorId
     };
