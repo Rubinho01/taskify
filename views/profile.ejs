@@ -132,11 +132,17 @@
             <h4 class="card-title mb-1"><strong>Name:</strong> <%= usuario.usunome %></h4>
             <p class="card-text text-muted mb-0"><i class="bi bi-person-circle"></i> Public Profile</p>
         </div>
+        <% if (verificarAmizade.amipendente === 1) { %>
+            <button type="submit" class="btn btn-danger rounded-pill">
+                <i class="bi bi-person-plus-fill me-1"></i> Pending
+            </button>
+        <% }else {%>
         <form action="/profile/<%= usuario.usuid %>/add-friend" method="POST">
             <button type="submit" class="btn btn-danger rounded-pill">
                 <i class="bi bi-person-plus-fill me-1"></i> Add Friend
             </button>
         </form>
+        <% } %>
      </div>
     </div>
    </div>
