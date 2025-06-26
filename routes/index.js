@@ -164,7 +164,8 @@ router.post('/task/:id/tarstauts', async function(req, res)
 
 
 
-router.get('/dashboard', verificarSessao, async function(req, res) {
+router.get('/dashboard', verificarSessao, async function(req, res) 
+{
   const usuid = global.usucodigo;
   const contagem = await global.banco.contagemDashboardUsuario(usuid);
 
@@ -175,20 +176,31 @@ router.get('/dashboard', verificarSessao, async function(req, res) {
   });
 });
 
-router.get('/sair', verificarSessao, async function(req, res) {
+router.get('/sair', verificarSessao, async function(req, res) 
+{
   delete global.usucodigo
   delete global.usuemail
   delete global.usunome
   res.redirect('/');
 });
 
-router.get('/profile/:id', verificarSessao, async function(req, res, next) {
+router.get('/profile/:id', verificarSessao, async function(req, res, next)
+{
   const usuid = parseInt(req.params.id);
   const usuario = await global.banco.buscarUsuarioPorId(usuid);
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
+  const verificarAmizade = await global.banco.verificarAmizade(global.usucodigo, usuid);
   if(usuario)
-    return res.render('profile', {usuario, quadrosUsuario, nome: global.usunome, quadro:null});
+    return res.render('profile', {usuario, quadrosUsuario, nome: global.usunome, quadro:null, verificarAmizade});
 });
+
+router.post('/profile/:id/add-friend', verificarSessao, async function(req, res, next)
+{
+  const amiId = parseInt(req.params.id);
+  await global.banco.registrarPedidoAmizade(global.usucodigo, amiId);
+  res.redirect('back');
+  
+})
 
 //MIDDLEWARES
 function verificarSessao(req, res, next) {

@@ -244,6 +244,22 @@ async function buscarUsuarioPorId(id) {
     else {};
     
 }
+
+async function registrarPedidoAmizade(usuid, amiId){
+    const conex = await conectarBD();
+    const sql = "INSERT INTO amizades(amienvia, amirecebe) VALUES (?,?)";
+    await conex.query(sql,[usuid, amiId]);
+    
+}
+async function verificarAmizade(usucodigo, amiid){
+    const conex = await conectarBD();
+    const sql = `SELECT * FROM amizades where amienvia = ? and amirecebe = ?
+                OR
+                amienvia= ? and amirecebe= ?`;
+    const [verificarAmizade] = await conex.query(sql,[usucodigo, amiid, amiid, usucodigo])
+    if(verificarAmizade.length>0) return verificarAmizade[0];
+    else return {};
+}
 async function contagemDashboardUsuario(usuid){
     const conexao = await conectarBD();
 
@@ -264,5 +280,5 @@ async function contagemDashboardUsuario(usuid){
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
-        contagemDashboardUsuario, buscarUsuarioPorId
+        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade
     };
