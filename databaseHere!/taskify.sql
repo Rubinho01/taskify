@@ -28,7 +28,7 @@ CREATE TABLE `admin` (
   `admsenha` varchar(30) NOT NULL,
   `admnome` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`admid`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,6 +39,36 @@ LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
 INSERT INTO `admin` VALUES (1,'admin1@taskify.com','senha123','Admin');
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `amizades`
+--
+
+DROP TABLE IF EXISTS `amizades`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `amizades` (
+  `amiid` int(11) NOT NULL AUTO_INCREMENT,
+  `amipendente` tinyint(4) NOT NULL DEFAULT 1,
+  `amienvia` int(11) DEFAULT NULL,
+  `amirecebe` int(11) DEFAULT NULL,
+  PRIMARY KEY (`amiid`),
+  KEY `amienvia` (`amienvia`),
+  KEY `amirecebe` (`amirecebe`),
+  CONSTRAINT `amizades_ibfk_1` FOREIGN KEY (`amienvia`) REFERENCES `usuarios` (`usuid`),
+  CONSTRAINT `amizades_ibfk_2` FOREIGN KEY (`amirecebe`) REFERENCES `usuarios` (`usuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `amizades`
+--
+
+LOCK TABLES `amizades` WRITE;
+/*!40000 ALTER TABLE `amizades` DISABLE KEYS */;
+INSERT INTO `amizades` VALUES (1,1,13,12),(3,1,13,8);
+/*!40000 ALTER TABLE `amizades` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -71,31 +101,6 @@ LOCK TABLES `comentarios` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `grupos`
---
-
-DROP TABLE IF EXISTS `grupos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `grupos` (
-  `grupoid` int(11) NOT NULL AUTO_INCREMENT,
-  `grunome` varchar(100) NOT NULL,
-  `grudesc` text DEFAULT NULL,
-  `criado_em` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`grupoid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `grupos`
---
-
-LOCK TABLES `grupos` WRITE;
-/*!40000 ALTER TABLE `grupos` DISABLE KEYS */;
-/*!40000 ALTER TABLE `grupos` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `quadros`
 --
 
@@ -107,7 +112,7 @@ CREATE TABLE `quadros` (
   `quanome` varchar(30) NOT NULL,
   `quadesc` varchar(50) NOT NULL,
   PRIMARY KEY (`quaid`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -116,7 +121,7 @@ CREATE TABLE `quadros` (
 
 LOCK TABLES `quadros` WRITE;
 /*!40000 ALTER TABLE `quadros` DISABLE KEYS */;
-INSERT INTO `quadros` VALUES (18,'ServerSide','Fazer o site'),(19,'BancoDeDados','Banco'),(20,'Tarefas de casa','tarefas que preciso fazer em casa');
+INSERT INTO `quadros` VALUES (18,'ServerSide','Fazer o site'),(19,'BancoDeDados','Banco'),(20,'Tarefas de casa','tarefas que preciso fazer em casa'),(23,'quadro1','desc1'),(24,'sadfsdf','dsfsdf'),(25,'quadro1','desc1'),(26,'Quadro1','desc do quadro 1');
 /*!40000 ALTER TABLE `quadros` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,7 +148,7 @@ CREATE TABLE `quadros_usuarios` (
 
 LOCK TABLES `quadros_usuarios` WRITE;
 /*!40000 ALTER TABLE `quadros_usuarios` DISABLE KEYS */;
-INSERT INTO `quadros_usuarios` VALUES (18,8),(19,8),(20,9);
+INSERT INTO `quadros_usuarios` VALUES (18,8),(19,8),(20,9),(24,9),(25,9),(26,13);
 /*!40000 ALTER TABLE `quadros_usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,7 +171,7 @@ CREATE TABLE `tarefas` (
   KEY `tarqua` (`tarqua`),
   CONSTRAINT `tarefas_ibfk_1` FOREIGN KEY (`tarusu`) REFERENCES `usuarios` (`usuid`),
   CONSTRAINT `tarefas_ibfk_2` FOREIGN KEY (`tarqua`) REFERENCES `quadros` (`quaid`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,11 +197,8 @@ CREATE TABLE `usuarios` (
   `usuemail` varchar(30) NOT NULL,
   `usunascimento` date NOT NULL,
   `ususenha` varchar(30) NOT NULL,
-  `grupoid` int(11) DEFAULT NULL,
-  PRIMARY KEY (`usuid`),
-  KEY `fk_usuarios_grupos` (`grupoid`),
-  CONSTRAINT `fk_usuarios_grupos` FOREIGN KEY (`grupoid`) REFERENCES `grupos` (`grupoid`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`usuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -205,34 +207,8 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (8,'Conta Teste Entrega','testeEntrega@gmail.com','2001-01-01','123',NULL),(9,'Rubinho','rubem@gmail.com','2004-09-22','rubemg007',NULL);
+INSERT INTO `usuarios` VALUES (8,'Conta Teste Entrega','testeEntrega@gmail.com','2001-01-01','123'),(9,'Rubinho','rubem@gmail.com','2004-09-22','rubemg007'),(12,'Joselito','joselito@gmail.com','2004-03-20','abcd123'),(13,'Rubem Krüger','rubem@gmail.com','2004-09-22','123');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `usuarios_grupos`
---
-
-DROP TABLE IF EXISTS `usuarios_grupos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `usuarios_grupos` (
-  `usuid` int(11) NOT NULL,
-  `grupoid` int(11) NOT NULL,
-  PRIMARY KEY (`usuid`,`grupoid`),
-  KEY `grupoid` (`grupoid`),
-  CONSTRAINT `usuarios_grupos_ibfk_1` FOREIGN KEY (`usuid`) REFERENCES `usuarios` (`usuid`),
-  CONSTRAINT `usuarios_grupos_ibfk_2` FOREIGN KEY (`grupoid`) REFERENCES `grupos` (`grupoid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `usuarios_grupos`
---
-
-LOCK TABLES `usuarios_grupos` WRITE;
-/*!40000 ALTER TABLE `usuarios_grupos` DISABLE KEYS */;
-/*!40000 ALTER TABLE `usuarios_grupos` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -244,4 +220,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-31 18:53:49
+-- Dump completed on 2025-06-28 14:37:42

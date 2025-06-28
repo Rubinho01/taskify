@@ -1,0 +1,2 @@
+O PROXIMO PASSO é criar a tabela notificações com usuario e id, adicionar uma trigger que sempre 
+após um insert na tabela amizades com amipendente == 1, vai disparar uma notificação para amirecebe. 
