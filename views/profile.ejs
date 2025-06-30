@@ -136,6 +136,10 @@
             <button type="submit" class="btn btn-danger rounded-pill">
                 <i class="bi bi-person-plus-fill me-1"></i> Pending
             </button>
+              <% }else if (verificarAmizade.amipendente === 0) { %>
+            <button type="submit" class="btn btn-danger rounded-pill">
+                <i class=" me-1"></i> Friends
+            </button>
         <% }else {%>
         <form action="/profile/<%= usuario.usuid %>/add-friend" method="POST">
             <button type="submit" class="btn btn-danger rounded-pill">
