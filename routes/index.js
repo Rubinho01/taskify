@@ -64,6 +64,7 @@ router.post('/register', async function(req, res, next)
 router.get('/boards', verificarSessao, async function (req, res){
   const usuid = global.usucodigo;
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
+  global.quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   console.log(quadrosUsuario);
   res.render('boards', { 
     nome: global.usunome, quadrosUsuario, quadro: null });
@@ -199,6 +200,22 @@ router.post('/profile/:id/add-friend', verificarSessao, async function(req, res,
   const amiId = parseInt(req.params.id);
   await global.banco.registrarPedidoAmizade(global.usucodigo, amiId);
   res.redirect('back');
+  
+})
+
+router.get('/friends', verificarSessao, async function (req, res, next)
+{
+  const amizades = await global.banco.buscarAmigosUsuario(global.usucodigo);
+  const amigos = [];
+
+  for (const amizade of amizades) {
+    const amigoId = amizade.amienvia === global.usucodigo ? amizade.amirecebe : amizade.amienvia;
+    const amigo = await global.banco.buscarUsuarioPorId(amigoId);
+    if (amigo) {
+      amigos.push(amigo);
+    }
+  }
+  res.render('amigos', {amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome});
   
 })
 
