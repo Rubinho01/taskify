@@ -206,16 +206,34 @@ router.post('/profile/:id/add-friend', verificarSessao, async function(req, res,
 router.get('/friends', verificarSessao, async function (req, res, next)
 {
   const amizades = await global.banco.buscarAmigosUsuario(global.usucodigo);
-  const amigos = [];
+  global.amigos = [];
+  console.log(amizades);
+
+  if(!amizades && amizades.lenght<1)
+  {
+    return res.render('friends', {amigos: global.amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: null});
+  }
 
   for (const amizade of amizades) {
     const amigoId = amizade.amienvia === global.usucodigo ? amizade.amirecebe : amizade.amienvia;
     const amigo = await global.banco.buscarUsuarioPorId(amigoId);
     if (amigo) {
-      amigos.push(amigo);
+      global.amigos.push(amigo);
     }
   }
-  res.render('amigos', {amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome});
+  res.render('friends', {amigos: global.amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: null});
+  
+})
+
+router.post('/friends/remove/:id', verificarSessao, async function(req, res, next)
+{
+  const amiid = parseInt(req.params.id);
+  const verificarAmizade = await global.banco.verificarAmizade(global.usucodigo, amiid);
+  if (!verificarAmizade && verificarAmizade == ""){
+    return res.redirect('/friends', {amigos: global.amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: amiid + "aren't your friend"})
+  }
+  await global.banco.removerAmizade(global.usucodigo,amiid);
+  return res.redirect('back');
   
 })
 

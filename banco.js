@@ -279,7 +279,18 @@ async function buscarAmigosUsuario(usuid) {
     const sql =  "SELECT * FROM amizades where amienvia=? and amipendente=0 or amirecebe=? and amipendente=0"
     const [amigos] = await conex.query(sql,[usuid,usuid]);
     if(amigos.length > 0) return amigos;
-    else return {};
+    else return [];
+    
+}
+
+async function removerAmizade(usuid,amiid)
+{
+    const conex = await conectarBD();
+    const sql = `DELETE FROM amizades WHERE
+                ((amienvia=? AND amirecebe=?)
+                OR
+                (amienvia=? AND amirecebe=?));`
+    await conex.query(sql,[usuid, amiid, amiid, usuid]);
     
 }
 
@@ -288,5 +299,5 @@ async function buscarAmigosUsuario(usuid) {
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
-        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario
+        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade
     };
