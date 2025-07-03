@@ -294,10 +294,38 @@ async function removerAmizade(usuid,amiid)
     
 }
 
+async function verificarAmizadesPendentes(usuid){
+    const conex = await conectarBD();
+    const sql = `SELECT am.amiid, u.usunome as amienvia, am.amienvia as amienviaid from amizades am
+               inner join usuarios u on u.usuid = am.amienvia
+               WHERE amirecebe=? AND amipendente=1; `;
+    const [amizadesPendentes] = await conex.query(sql, [usuid]);
+    if(amizadesPendentes.length > 0) return amizadesPendentes;
+    else return [];
+    
+}
+
+async function verificarPedidoDeAmizade(amiid, usuid) {
+    const conex = await conectarBD();
+    const sql = "SELECT * FROM AMIZADES WHERE amienvia=? AND amirecebe=? AND amipendente=1;"
+    const [pedidoAmizade] = await conex.query(sql, [amiid, usuid]);
+    if(pedidoAmizade.length>0) return true;
+    else return false;
+    
+}
+
+async function aceitarPedidoDeAmizade(amiid, usuid) {
+    const conex = await conectarBD();
+    const sql = "UPDATE amizades SET amipendente=0 WHERE amienvia=? and amirecebe=?"
+    await conex.query(sql, [amiid, usuid]);
+}
+
+
 
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
-        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade
+        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,
+        verificarPedidoDeAmizade, aceitarPedidoDeAmizade
     };

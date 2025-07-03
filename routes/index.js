@@ -235,7 +235,38 @@ router.post('/friends/remove/:id', verificarSessao, async function(req, res, nex
   await global.banco.removerAmizade(global.usucodigo,amiid);
   return res.redirect('back');
   
+});
+
+router.get('/friend-requests', verificarSessao, async function(req, res, next) {
+  const amizadesPendentes = await global.banco.verificarAmizadesPendentes(global.usucodigo);
+  console.log(amizadesPendentes);
+
+  if(!amizadesPendentes && amizadesPendentes.lenght<1){
+    return res.render('friend-requests', {amizadesPendentes: null, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: "You don't have friend requests now"});
+  }
+  res.render('friend-requests', {amizadesPendentes, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: null});
+  
 })
+
+router.post('/friend-requests/decline/:id', verificarSessao, async function(req, res, next) {
+  const amiid = parseInt(req.params.id);
+  const verificarPedido = await global.banco.verificarPedidoDeAmizade(amiid, global.usucodigo);
+  if(verificarPedido === false) return res.redirect('/friend-requests');
+  await global.banco.removerAmizade(global.usucodigo,amiid);
+  res.redirect('back');
+  
+});
+
+router.post('/friend-requests/accept/:id', verificarSessao, async function(req, res, next) {
+  const amiid = parseInt(req.params.id);
+  const verificarPedido = await global.banco.verificarPedidoDeAmizade(amiid, global.usucodigo);
+  if(verificarPedido === false) return res.redirect('/friend-requests');
+  await global.banco.aceitarPedidoDeAmizade(amiid, global.usucodigo);
+  res.redirect('back');
+  
+  });
+
+
 
 //MIDDLEWARES
 function verificarSessao(req, res, next) {
