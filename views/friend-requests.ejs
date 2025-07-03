@@ -72,10 +72,14 @@
   <div class="main">
       <%- include('LifeQuality/header') %>
 
+      <a  style="width: 100px;" href="/friends" class="btn btn-outline-danger">&larr; Voltar</a>
     <% if(erro) { %>
         <h3 style="color: red;"><%= erro %></h3>
     <% } %>
-        
+
+         <% if(amizadesPendentes.length < 1 ) { %>
+            <h3>No requests</h3>
+         <% } %>
         <% if(amizadesPendentes) { %>
         <% amizadesPendentes.forEach(ap => {%>
         <div class="friend-card">
@@ -84,16 +88,17 @@
             <p class="mb-0 text-muted">ID: <%= ap.amienviaid %></p>
           </div>
           <div class="d-flex">
+            <form action="/friend-requests/accept/<%= ap.amienviaid %>" method="post">
+            <button class="btn btn-outline-success p-2 rounded-pill" type="submit">
+            <i class="bi bi-x "></i> Accept
+            </button>
+          </form>
           <form action="/friend-requests/decline/<%= ap.amienviaid %>" method="post">
             <button class="btn btn-outline-danger p-2 rounded-pill" type="submit">
             <i class="bi bi-x "></i> Decline
             </button>
           </form>
-          <form action="/friend-requests/accept/<%= ap.amienviaid %>" method="post">
-            <button class="btn btn-outline-success p-2 rounded-pill" type="submit">
-            <i class="bi bi-x "></i> Accept
-            </button>
-          </form>
+          
           </div>
         </div>
          <% })}; %>
