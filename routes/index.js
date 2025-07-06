@@ -207,6 +207,14 @@ router.post('/profile/:id/add-friend', verificarSessao, async function(req, res,
   
 })
 
+router.post('/profiles-find', verificarSessao, async function(req,res,next)
+ {
+    const nome = req.body.nome;
+    const usuarios = await global.banco.buscarUsuarioPorNome(nome);
+    res.render('profiles-by-name', {usuarios, nome: global.usunome, quadrosUsuario, quadro: null, notificacoes: global.notificacoes});
+  
+})
+
 router.get('/friends', verificarSessao, async function (req, res, next)
 {
   const amizades = await global.banco.buscarAmigosUsuario(global.usucodigo);
