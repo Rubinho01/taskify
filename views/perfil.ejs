@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Perfil</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #f1cfcf, #f1cfcf);
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: visible;
+    }
+
+    aside {
+      width: 240px;
+      background-color: #f1cfcf;
+      border-right: 1px solid #f1cfcf;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-x: visible;
+    }
+
+    .profile-container {
+      max-width: 5000px;
+      width: 720px;
+      margin: 9rem auto;
+      padding: 0 1rem;
+    }
+
+    .profile-container h2 {
+      color: #e61313;
+      font-weight: 600;
+      border-bottom: 1px solid #e61313;
+      padding-bottom: 6px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .column { width: 220px; }
+      aside { width: 200px; }
+    }
+
+    @media (max-width: 768px) {
+      aside { display: none; }
+      .main { flex: 1 1 100%; }
+    }
+    
+  </style>
+</head>
+<body>
+
+  <%- include('LifeQuality/sidebar') %>
+
+  <div class="main">
+    <%- include('LifeQuality/header') %>
+
+    <div class="profile-container">
+      <h2>Dados do Perfil</h2>
+
+      <% if (mensagem) { %>
+        <div class="alert <%= sucesso ? 'alert-success' : 'alert-danger' %> alert-dismissible fade show" role="alert">
+          <%= mensagem %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+      <% } %>
+
+      <form action="/perfil/atualizar" method="POST" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="nome" class="form-label fw-medium">Name</label>
+          <input
+            type="text"
+            id="nome"
+            name="nome"
+            class="form-control"
+            value="<%= usuario.usunome %>"
+            required
+            style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
+          />
+          <div class="invalid-feedback">Por favor, informe seu nome.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label fw-medium">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            value="<%= usuario.usuemail %>"
+            required
+            style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
+          />
+          <div class="invalid-feedback">Por favor, informe um e-mail válido.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="senha" class="form-label fw-medium">New Password</label>
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            class="form-control"
+            placeholder="Digite nova senha (opcional)"
+            style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
+          />
+          <small class="text-muted">Deixe em branco para manter a senha atual.</small>
+        </div>
+        <div class="mb-4">
+  <label for="senhaAtual" class="form-label fw-medium">Current Password
+</label>
+  <input
+    type="password"
+    id="senhaAtual"
+    name="senhaAtual"
+    class="form-control"
+    placeholder="Digite sua senha atual para confirmar"
+    required
+    style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
+  />
+  <div class="invalid-feedback">Você precisa informar sua senha atual para confirmar as alterações.</div>
+</div>
+        <button type="submit" class="btn btn-danger w-100 fw-semibold" style="padding: 0.5rem 0;">
+          Salvar Alterações
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict'
+      const forms = document.querySelectorAll('.needs-validation')
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })();
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

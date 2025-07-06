@@ -170,11 +170,13 @@ router.get('/dashboard', verificarSessao, async function(req, res)
   const usuid = global.usucodigo;
   const contagem = await global.banco.contagemDashboardUsuario(usuid);
 
-  res.render('dashboard', {
-    nome: global.usunome,
-    totalQuadros: contagem.totalQuadros,
-    totalTarefas: contagem.totalTarefas
-  });
+ res.render('dashboard', {
+  nome: global.usunome,
+  totalQuadros: contagem.totalQuadros,
+  totalTarefas: contagem.totalTarefas,
+  tarefasConcluidas: contagem.tarefasConcluidas,
+  tarefasNaoConcluidas: contagem.tarefasNaoConcluidas
+});
 });
 
 router.get('/sair', verificarSessao, async function(req, res) 
@@ -284,6 +286,68 @@ function verificarSessao(req, res, next) {
   
 }
 
+
+
+router.get('/perfil', verificarSessao, async function(req, res, next) {
+  const usuario = await global.banco.buscarUsuarioPorId(global.usucodigo);
+  const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo); 
+
+  res.render('perfil', {
+    usuario,
+    nome: usuario.usunome, 
+    quadrosUsuario,       
+    quadro: null,          
+    mensagem: null,
+    sucesso: null
+  });
+});
+
+router.post('/perfil/atualizar', verificarSessao, async function(req, res, next) {
+    const usuid = global.usucodigo;
+    const { nome, email, senha, senhaAtual } = req.body;
+
+    const usuario = await global.banco.buscarUsuarioPorId(usuid);
+    const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(usuid);
+
+    if (!senhaAtual || senhaAtual !== usuario.ususenha) {
+      return res.render('perfil', {
+        usuario,
+        nome: usuario.usunome,
+        quadrosUsuario,
+        quadro: null,
+        mensagem: 'Senha atual incorreta. Nenhuma alteração foi realizada.',
+        sucesso: false
+      });
+    }
+
+    let mensagens = [];
+
+    if (nome && nome !== usuario.usunome) {
+      await global.banco.atualizarNome(usuid, nome);
+      mensagens.push('Nome atualizado com sucesso!');
+    }
+
+    if (email && email !== usuario.usuemail) {
+      await global.banco.atualizarEmail(usuid, email);
+      mensagens.push('E-mail atualizado com sucesso!');
+    }
+
+    if (senha) {
+      await global.banco.atualizarSenha(usuid, senha);
+      mensagens.push('Senha atualizada com sucesso!');
+    }
+
+    const usuarioAtualizado = await global.banco.buscarUsuarioPorId(usuid);
+
+    res.render('perfil', {
+      usuario: usuarioAtualizado,
+      nome: usuarioAtualizado.usunome,
+      quadrosUsuario,
+      quadro: null,
+      mensagem: mensagens.length ? mensagens.join(' ') : 'Nenhuma alteração realizada.',
+      sucesso: true
+    });
+});
 
 /* ERROS */
 module.exports = router;
