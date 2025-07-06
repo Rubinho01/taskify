@@ -75,7 +75,17 @@
     <% if(erro){ %>
       <h3 style="color: red;"><%= erro %></h3>
     <% } %>
-
+    <button id="mostrarBusca" class="btn btn-danger btn-pending-requests rounded-pill">
+      <i class="bi bi-person-add me-1"></i> Add new friend
+    </button>
+    <form method="post" action="/profiles-find" id="formBusca" style="display: none; width: 300px; margin-left: auto;" class="p-3">
+      <div class="input-group mb-3">
+        <input type="text" name="nome" class="form-control border-danger rounded-end" id="campoBusca" placeholder="Enter a user name..." />
+        <button type="submit" class="input-group-text bg-danger text-white border-danger">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </form>
     <a href="/friend-requests" class="btn btn-danger btn-pending-requests rounded-pill">
       <i class="bi bi-hourglass-split me-1"></i> View pending requests
     </a>
@@ -104,5 +114,10 @@
     <% } %>
   </div>
 
+  <script>
+   document.getElementById('mostrarBusca').addEventListener('click', () => {
+   document.getElementById('formBusca').style.display = 'block';
+   });
+  </script>
 </body>
 </html>

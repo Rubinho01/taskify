@@ -384,6 +384,16 @@ async function marcarQuadroFavorito(quaid, favorito) {
   return await conex.query(sql, [valorFavorito, quaid]);
 }
 
+async function buscarUsuarioPorNome(nome)
+{ 
+  const conex = await conectarBD();
+  const sql = "SELECT * FROM usuarios where usunome like ?";
+  const [usuarios] = await conex.query(sql, [`%${nome}%`]);
+  if(usuarios.length>0) return usuarios;
+  else return [];
+  
+}
+
 
 
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
@@ -391,4 +401,6 @@ async function marcarQuadroFavorito(quaid, favorito) {
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
-        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes }
+        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes,
+        buscarUsuarioPorNome 
+      }
