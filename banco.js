@@ -201,16 +201,24 @@ async function atualizarStatusTarefa(tarstatus, tarid) {
 
 async function buscarQuadrosDoUsuario(usuid) {
   const sql = `
-    SELECT q.quaid, q.quanome, q.quadesc, t.tarid, t.tarnome, t.tarstatus
+    SELECT 
+      q.quaid, 
+      q.quanome, 
+      q.quadesc, 
+      t.tarid, 
+      t.tarnome, 
+      t.tarstatus,
+      CASE WHEN f.usuid IS NOT NULL THEN 1 ELSE 0 END AS favorito
     FROM quadros_usuarios qu
     JOIN quadros q ON qu.quaid = q.quaid
     LEFT JOIN tarefas t ON q.quaid = t.tarqua
+    LEFT JOIN favoritos f ON f.quaid = q.quaid AND f.usuid = ?
     WHERE qu.usuid = ?
-    ORDER BY q.quaid, t.tarid;
+    ORDER BY favorito DESC, q.quaid, t.tarid;
   `;
 
   const conexao = await conectarBD();
-  const [rows] = await conexao.execute(sql, [usuid]);
+  const [rows] = await conexao.execute(sql, [usuid, usuid]);
 
   const quadros = new Map();
 
@@ -220,6 +228,7 @@ async function buscarQuadrosDoUsuario(usuid) {
         id: item.quaid,
         nome: item.quanome,
         descricao: item.quadesc,
+        favorito: item.favorito === 1,
         tarefas: []
       });
     }
@@ -235,6 +244,7 @@ async function buscarQuadrosDoUsuario(usuid) {
 
   return Array.from(quadros.values());
 }
+
 
 async function buscarUsuarioPorId(id) {
     const conex = await conectarBD();
@@ -261,18 +271,31 @@ async function verificarAmizade(usucodigo, amiid){
     else return {};
 }
 async function contagemDashboardUsuario(usuid){
-    const conexao = await conectarBD();
+  const conexao = await conectarBD();
 
-    const [[{totalQuadros}]] = await conexao.execute(`
+  const [[{totalQuadros}]] = await conexao.execute(`
     SELECT COUNT(DISTINCT quaid) AS totalQuadros 
     FROM quadros_usuarios WHERE usuid = ?`, [usuid]);
 
-    const [[{totalTarefas}]] = await conexao.execute(`SELECT COUNT(t.tarid) AS totalTarefas
-        from tarefas t inner join quadros_usuarios qu on t.tarqua = qu.quaid where qu.usuid=?`, [usuid])
+  const [[{totalTarefas}]] = await conexao.execute(`
+    SELECT COUNT(t.tarid) AS totalTarefas
+    FROM tarefas t 
+    INNER JOIN quadros_usuarios qu ON t.tarqua = qu.quaid 
+    WHERE qu.usuid = ?`, [usuid]);
 
+  const [[{tarefasConcluidas}]] = await conexao.execute(`
+    SELECT COUNT(t.tarid) AS tarefasConcluidas
+    FROM tarefas t 
+    INNER JOIN quadros_usuarios qu ON t.tarqua = qu.quaid 
+    WHERE qu.usuid = ? AND t.tarstatus = 1`, [usuid]);
 
-    return {totalQuadros, totalTarefas};
+  const [[{tarefasNaoConcluidas}]] = await conexao.execute(`
+    SELECT COUNT(t.tarid) AS tarefasNaoConcluidas
+    FROM tarefas t 
+    INNER JOIN quadros_usuarios qu ON t.tarqua = qu.quaid 
+    WHERE qu.usuid = ? AND t.tarstatus = 0`, [usuid]);
 
+  return {totalQuadros, totalTarefas, tarefasConcluidas, tarefasNaoConcluidas};
 }
 async function buscarAmigosUsuario(usuid) {
     const conex = await conectarBD();
@@ -320,6 +343,7 @@ async function aceitarPedidoDeAmizade(amiid, usuid) {
     await conex.query(sql, [amiid, usuid]);
 }
 
+
 async function verificarNotificacoes(usuid) {
     const conex = await conectarBD();
     const sql = "select * from notamizades where idrecebe=?"
@@ -329,12 +353,42 @@ async function verificarNotificacoes(usuid) {
     
 }
 
+async function atualizarNome(usuid, nome) {
+  const conex = await conectarBD();
+  const sql = "UPDATE usuarios SET usunome = ? WHERE usuid = ?";
+  await conex.query(sql, [nome, usuid]);
+}
+
+async function atualizarEmail(usuid, email) {
+  const conex = await conectarBD();
+  const sql = "UPDATE usuarios SET usuemail = ? WHERE usuid = ?";
+  await conex.query(sql, [email, usuid]);
+}
+
+async function atualizarSenha(usuid, senha) {
+  const conex = await conectarBD();
+  const sql = "UPDATE usuarios SET ususenha = ? WHERE usuid = ?";
+  await conex.query(sql, [senha, usuid]);
+}
+
+async function atualizarBio(usuid, bio) {
+  const conex = await conectarBD();
+  const sql = "UPDATE usuarios SET usubio = ? WHERE usuid = ?"
+  await conex.query(sql, [bio, usuid]);
+}
+
+async function marcarQuadroFavorito(quaid, favorito) {
+  const conex = await conectarBD();
+  const sql = 'UPDATE quadros SET favorito = ? WHERE quaid = ?';
+  const valorFavorito = favorito ? 1 : 0;
+  return await conex.query(sql, [valorFavorito, quaid]);
+}
+
 
 
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
-        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,
-        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, verificarNotificacoes
-    };
+        contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
+        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes }

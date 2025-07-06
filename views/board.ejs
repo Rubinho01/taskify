@@ -87,53 +87,77 @@
       font-weight: 700;
       color: #b30000;
     }
+    .favorite-board-btn {
+      background: none;
+      border: none;
+      outline: none;
+      padding: 0;
+      color: gold;
+      transition: color 0.2s;
+    }
+    .favorite-board-btn:hover i {
+      color: orange;
+    }
   </style>
 </head>
 <body>
 
-    <%- include('LifeQuality/header') %>
+  <%- include('LifeQuality/header') %>
 
   <main class="card-main">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <a href="/boards" class="btn btn-outline-danger">&larr; Voltar</a>
-    <div class="header-title" style="margin: 0;">
-      <h2><%= quadro.quanome %></h2>
-      <a href="/board/<%= quadro.quaid %>/new-task" class="add-task-btn" title="Adicionar nova tarefa">+</a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <a href="/boards" class="btn btn-outline-danger">&larr; Voltar</a>
+      <div class="header-title" style="margin: 0;">
+        <h2 class="d-flex align-items-center gap-2">
+          <%= quadro.quanome %>
+          <button class="favorite-board-btn" data-board-id="<%= quadro.quaid %>" title="Favoritar quadro">
+            <i class="bi <%= quadro.favorito ? 'bi-star-fill' : 'bi-star' %>" style="font-size: 1.5rem;"></i>
+          </button>
+        </h2>
+        <a href="/board/<%= quadro.quaid %>/new-task" class="add-task-btn" title="Adicionar nova tarefa">+</a>
+      </div>
     </div>
-  </div>
 
-  <% if (tarefas.length === 0) { %>
-    <p>No tasks registered.</p>
-  <% } else { %>
-    <% tarefas.forEach(t => { %>
-      <a href="/board/<%= quadro.quaid %>/task/<%= t.tarid %>" class="task-item">
-        <span><%= t.tarnome %></span>
-        <input type="checkbox" class="task-checkbox" disabled <%= t.tarstatus === 1 ? 'checked' : '' %> />
-      </a>
-    <% }) %>
-  <% } %>
-</main>
+    <% if (tarefas.length === 0) { %>
+      <p>No tasks registered.</p>
+    <% } else { %>
+      <% tarefas.forEach(t => { %>
+        <a href="/board/<%= quadro.quaid %>/task/<%= t.tarid %>" class="task-item">
+          <span><%= t.tarnome %></span>
+          <input type="checkbox" class="task-checkbox" disabled <%= t.tarstatus === 1 ? 'checked' : '' %> />
+        </a>
+      <% }) %>
+    <% } %>
+  </main>
 
   <script>
     const userIcon = document.getElementById('userIcon');
     const userMenu = document.getElementById('userMenu');
-
-    userIcon.addEventListener('click', () => {
-      if (userMenu.style.display === 'none' || userMenu.style.display === '') {
-        userMenu.style.display = 'block';
-      } else {
+    userIcon?.addEventListener('click', () => {
+      userMenu.style.display = (userMenu.style.display === 'block') ? 'none' : 'block';
+    });
+    document.addEventListener('click', (event) => {
+      if (!userIcon?.contains(event.target) && !userMenu?.contains(event.target)) {
         userMenu.style.display = 'none';
       }
     });
+    document.querySelector('.favorite-board-btn')?.addEventListener('click', async function (e) {
+      e.preventDefault();
+      const icon = this.querySelector('i');
+      const boardId = this.getAttribute('data-board-id');
+      const isFavorited = icon.classList.contains('bi-star-fill');
 
-    document.addEventListener('click', (event) => {
-      if (!userIcon.contains(event.target) && !userMenu.contains(event.target)) {
-        userMenu.style.display = 'none';
-      }
+      await fetch(`/board/${boardId}/favorite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ favorito: !isFavorited })
+      });
+
+      icon.classList.toggle('bi-star');
+      icon.classList.toggle('bi-star-fill');
     });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 </body>
 </html>

@@ -39,3 +39,8 @@ label{
   display: flex;
   height: 100vh; /* Garante que a altura ocupa toda a tela */
 }
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
