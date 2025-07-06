@@ -129,15 +129,15 @@
       <% quadrosUsuario.forEach(function(quadro) { %>
         <div class="column" onclick="location.href='/board/<%= quadro.id %>'">
           <h3>
-            <strong>Nome:</strong> 
+            <strong>Name:</strong> 
             <span style="text-decoration: underline; color: red;"><%= quadro.nome %></span>
           </h3>
           <p>
-            <strong>Descrição:</strong> 
+            <strong>Description:</strong> 
             <span style="text-decoration: underline; color: red;"><%= quadro.descricao %></span>
           </p>
           <% if (quadro.tarefas.length > 0) { %>
-            <p><strong>Tarefas:</strong></p>
+            <p><strong>Tasks:</strong></p>
             <% quadro.tarefas.forEach(function(tarefa) { %>
               <div class="task-card">
                 <div class="card-content">
@@ -147,7 +147,7 @@
               </div>
             <% }) %>
           <% } else { %>
-            <p><strong>Tarefas:</strong> <em>Sem tarefas</em></p>
+            <p><strong>Tasks:</strong> <em>No tasks registered.</em></p>
           <% } %>
         </div>
       <% }) %>

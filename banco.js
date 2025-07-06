@@ -320,6 +320,15 @@ async function aceitarPedidoDeAmizade(amiid, usuid) {
     await conex.query(sql, [amiid, usuid]);
 }
 
+async function verificarNotificacoes(usuid) {
+    const conex = await conectarBD();
+    const sql = "select * from notamizades where idrecebe=?"
+    const [notificacoes] = await conex.query(sql,[usuid]);
+    if(notificacoes.length>0) return notificacoes;
+    else return [];
+    
+}
+
 
 
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
@@ -327,5 +336,5 @@ async function aceitarPedidoDeAmizade(amiid, usuid) {
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,
-        verificarPedidoDeAmizade, aceitarPedidoDeAmizade
+        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, verificarNotificacoes
     };

@@ -66,8 +66,10 @@ router.get('/boards', verificarSessao, async function (req, res){
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   global.quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   console.log(quadrosUsuario);
+  global.notificacoes = await global.banco.verificarNotificacoes(global.usucodigo);
+  console.log("Notificações: " + global.notificacoes);
   res.render('boards', { 
-    nome: global.usunome, quadrosUsuario, quadro: null });
+    nome: global.usunome, quadrosUsuario, quadro: null, notificacoes: global.notificacoes });
 });
 
 /* GET CRIAR QUADRO */
