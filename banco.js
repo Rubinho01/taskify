@@ -343,6 +343,16 @@ async function aceitarPedidoDeAmizade(amiid, usuid) {
     await conex.query(sql, [amiid, usuid]);
 }
 
+
+async function verificarNotificacoes(usuid) {
+    const conex = await conectarBD();
+    const sql = "select * from notamizades where idrecebe=?"
+    const [notificacoes] = await conex.query(sql,[usuid]);
+    if(notificacoes.length>0) return notificacoes;
+    else return [];
+    
+}
+
 async function atualizarNome(usuid, nome) {
   const conex = await conectarBD();
   const sql = "UPDATE usuarios SET usunome = ? WHERE usuid = ?";
@@ -375,9 +385,10 @@ async function marcarQuadroFavorito(quaid, favorito) {
 }
 
 
+
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
-        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio }
+        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes }

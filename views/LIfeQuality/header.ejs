@@ -26,9 +26,12 @@
     Notifications
   </button>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="#">Menu item</a></li>
-    <li><a class="dropdown-item" href="#">Menu item</a></li>
-    <li><a class="dropdown-item" href="#">Menu item</a></li>
+    <% if(notificacoes.length > 0){ %>
+      <% notificacoes.forEach(n => { %>
+        <% if(n.nottipo === 0){ %>
+    <li><a class="dropdown-item" href="#"><%= n.nomeenvia %> Quer ser seu amigo </a></li>
+    <% }})}; %>
+
   </ul>
 </div>
     <i class="bi bi-person-circle text-white fs-4" id="userIcon" style="cursor: pointer;"></i>

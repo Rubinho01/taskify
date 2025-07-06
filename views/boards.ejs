@@ -145,15 +145,15 @@
           <!-- A área que redireciona -->
           <div onclick="location.href='/board/<%= quadro.id %>'" style="cursor:pointer;">
             <h3 style="display: flex; align-items: center;">
-              <strong>Nome:</strong> 
+              <strong>Name:</strong> 
               <span style="text-decoration: underline; color: red; margin-left: 8px;"><%= quadro.nome %></span>
             </h3>
             <p>
-              <strong>Descrição:</strong> 
+              <strong>Description:</strong> 
               <span style="text-decoration: underline; color: red;"><%= quadro.descricao %></span>
             </p>
             <% if (quadro.tarefas.length > 0) { %>
-              <p><strong>Tarefas:</strong></p>
+              <p><strong>Tasks:</strong></p>
               <% quadro.tarefas.forEach(function(tarefa) { %>
                 <div class="task-card">
                   <div class="card-content">
@@ -163,15 +163,14 @@
                 </div>
               <% }) %>
             <% } else { %>
-              <p><strong>Tarefas:</strong> <em>Sem tarefas</em></p>
+              <p><strong>Tasks:</strong> <em>No tasks registered.</em></p>
             <% } %>
           </div>
 
-          <!-- Botão de favorito, fora do div de clique para não conflitar -->
           <button class="favorite-board-btn" 
                   data-board-id="<%= quadro.id %>" 
-                  title="Favoritar quadro"
-                  aria-label="Favoritar quadro">
+                  title="Favorite"
+                  aria-label="Favorite">
             <i class="bi <%= quadro.favorito ? 'bi-star-fill' : 'bi-star' %>"></i>
           </button>
         </div>
@@ -184,7 +183,7 @@
     document.querySelectorAll('.favorite-board-btn').forEach(btn => {
       btn.addEventListener('click', async function(e) {
         e.preventDefault();
-        e.stopPropagation(); // Para evitar ativar o clique no quadro
+        e.stopPropagation(); 
 
         const icon = this.querySelector('i');
         const boardId = this.getAttribute('data-board-id');
@@ -201,10 +200,10 @@
             icon.classList.toggle('bi-star-fill');
             icon.classList.toggle('bi-star');
           } else {
-            alert('Erro ao atualizar favorito.');
+            alert('Fail to favorite.');
           }
         } catch (err) {
-          alert('Erro de rede ao atualizar favorito.');
+          alert('Network error.');
         }
       });
     });
