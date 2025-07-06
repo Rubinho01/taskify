@@ -127,6 +127,17 @@
           <small class="text-muted">Deixe em branco para manter a senha atual.</small>
         </div>
         <div class="mb-4">
+          <label for="bio" class="form-label fw-medium">Biografia (opcional)</label>
+            <textarea
+              id="bio"
+              name="bio"
+              class="form-control"
+              rows="4"
+              placeholder="Escreva um pouco sobre você..."
+              style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
+            ><%= usuario.usubio || '' %></textarea>
+        </div>
+        <div class="mb-4">
   <label for="senhaAtual" class="form-label fw-medium">Current Password
 </label>
   <input

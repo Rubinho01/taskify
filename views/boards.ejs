@@ -116,6 +116,20 @@
         width: 200px;
       }
     }
+
+      .favorite-board-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      margin-left: 8px;
+      color: gold;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: color 0.2s;
+    }
+    .favorite-board-btn:hover {
+      color: orange;
+    }
   </style>
 </head>
 <body>
@@ -127,45 +141,72 @@
 
     <div class="board-container">
       <% quadrosUsuario.forEach(function(quadro) { %>
-        <div class="column" onclick="location.href='/board/<%= quadro.id %>'">
-          <h3>
-            <strong>Nome:</strong> 
-            <span style="text-decoration: underline; color: red;"><%= quadro.nome %></span>
-          </h3>
-          <p>
-            <strong>Descrição:</strong> 
-            <span style="text-decoration: underline; color: red;"><%= quadro.descricao %></span>
-          </p>
-          <% if (quadro.tarefas.length > 0) { %>
-            <p><strong>Tarefas:</strong></p>
-            <% quadro.tarefas.forEach(function(tarefa) { %>
-              <div class="task-card">
-                <div class="card-content">
-                  <input type="checkbox" <%= tarefa.status === 1  ? 'checked' : '' %> disabled>
-                  <label><%= tarefa.nome %></label>
+        <div class="column" style="position: relative;">
+          <!-- A área que redireciona -->
+          <div onclick="location.href='/board/<%= quadro.id %>'" style="cursor:pointer;">
+            <h3 style="display: flex; align-items: center;">
+              <strong>Nome:</strong> 
+              <span style="text-decoration: underline; color: red; margin-left: 8px;"><%= quadro.nome %></span>
+            </h3>
+            <p>
+              <strong>Descrição:</strong> 
+              <span style="text-decoration: underline; color: red;"><%= quadro.descricao %></span>
+            </p>
+            <% if (quadro.tarefas.length > 0) { %>
+              <p><strong>Tarefas:</strong></p>
+              <% quadro.tarefas.forEach(function(tarefa) { %>
+                <div class="task-card">
+                  <div class="card-content">
+                    <input type="checkbox" <%= tarefa.status === 1  ? 'checked' : '' %> disabled>
+                    <label><%= tarefa.nome %></label>
+                  </div>
                 </div>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <p><strong>Tarefas:</strong> <em>Sem tarefas</em></p>
-          <% } %>
+              <% }) %>
+            <% } else { %>
+              <p><strong>Tarefas:</strong> <em>Sem tarefas</em></p>
+            <% } %>
+          </div>
+
+          <!-- Botão de favorito, fora do div de clique para não conflitar -->
+          <button class="favorite-board-btn" 
+                  data-board-id="<%= quadro.id %>" 
+                  title="Favoritar quadro"
+                  aria-label="Favoritar quadro">
+            <i class="bi <%= quadro.favorito ? 'bi-star-fill' : 'bi-star' %>"></i>
+          </button>
         </div>
       <% }) %>
     </div>
   </div>
 
   <script>
-    const userIcon = document.getElementById("userIcon");
-    const userMenu = document.getElementById("userMenu");
+    // Adiciona evento para todos os botões de favorito
+    document.querySelectorAll('.favorite-board-btn').forEach(btn => {
+      btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation(); // Para evitar ativar o clique no quadro
 
-    userIcon.addEventListener("click", () => {
-      userMenu.style.display = userMenu.style.display === "block" ? "none" : "block";
-    });
+        const icon = this.querySelector('i');
+        const boardId = this.getAttribute('data-board-id');
+        const isFavorited = icon.classList.contains('bi-star-fill');
 
-    document.addEventListener("click", function (e) {
-      if (!userIcon.contains(e.target) && !userMenu.contains(e.target)) {
-        userMenu.style.display = "none";
-      }
+        try {
+          const response = await fetch(`/board/${boardId}/favorite`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ favorito: !isFavorited })
+          });
+
+          if (response.ok) {
+            icon.classList.toggle('bi-star-fill');
+            icon.classList.toggle('bi-star');
+          } else {
+            alert('Erro ao atualizar favorito.');
+          }
+        } catch (err) {
+          alert('Erro de rede ao atualizar favorito.');
+        }
+      });
     });
   </script>
 </body>
