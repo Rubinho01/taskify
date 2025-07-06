@@ -304,7 +304,7 @@ router.get('/perfil', verificarSessao, async function(req, res, next) {
 
 router.post('/perfil/atualizar', verificarSessao, async function(req, res, next) {
     const usuid = global.usucodigo;
-    const { nome, email, senha, senhaAtual } = req.body;
+    const { nome, email, senha, bio, senhaAtual } = req.body;
 
     const usuario = await global.banco.buscarUsuarioPorId(usuid);
     const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(usuid);
@@ -337,6 +337,11 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
       mensagens.push('Senha atualizada com sucesso!');
     }
 
+    if (bio !== undefined && bio !== usuario.usubio) {
+      await global.banco.atualizarBio(usuid, bio)
+      mensagens.push('Biografia atualizada com sucesso!')
+    }
+
     const usuarioAtualizado = await global.banco.buscarUsuarioPorId(usuid);
 
     res.render('perfil', {
@@ -348,6 +353,33 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
       sucesso: true
     });
 });
+
+router.get('/perfilview', verificarSessao, async function (req, res, next) {
+  const usuid = global.usucodigo;
+  const usuario = await global.banco.buscarUsuarioPorId(usuid);
+ res.render('perfilview', {
+    usuario,
+    nome: usuario.usunome, 
+    quadrosUsuario,       
+    quadro: null,          
+    mensagem: null,
+    sucesso: null
+  });
+});
+
+router.post('/board/:id/favorite', verificarSessao, async function(req, res) {
+  const quaid = parseInt(req.params.id);
+  const { favorito } = req.body;
+
+  try {
+    await global.banco.marcarQuadroFavorito(quaid, favorito);
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error("Erro ao favoritar quadro:", error);
+    res.status(500).json({ ok: false, erro: "Erro interno ao atualizar favorito." });
+  }
+});
+
 
 /* ERROS */
 module.exports = router;

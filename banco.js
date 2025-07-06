@@ -201,16 +201,24 @@ async function atualizarStatusTarefa(tarstatus, tarid) {
 
 async function buscarQuadrosDoUsuario(usuid) {
   const sql = `
-    SELECT q.quaid, q.quanome, q.quadesc, t.tarid, t.tarnome, t.tarstatus
+    SELECT 
+      q.quaid, 
+      q.quanome, 
+      q.quadesc, 
+      t.tarid, 
+      t.tarnome, 
+      t.tarstatus,
+      CASE WHEN f.usuid IS NOT NULL THEN 1 ELSE 0 END AS favorito
     FROM quadros_usuarios qu
     JOIN quadros q ON qu.quaid = q.quaid
     LEFT JOIN tarefas t ON q.quaid = t.tarqua
+    LEFT JOIN favoritos f ON f.quaid = q.quaid AND f.usuid = ?
     WHERE qu.usuid = ?
-    ORDER BY q.quaid, t.tarid;
+    ORDER BY favorito DESC, q.quaid, t.tarid;
   `;
 
   const conexao = await conectarBD();
-  const [rows] = await conexao.execute(sql, [usuid]);
+  const [rows] = await conexao.execute(sql, [usuid, usuid]);
 
   const quadros = new Map();
 
@@ -220,6 +228,7 @@ async function buscarQuadrosDoUsuario(usuid) {
         id: item.quaid,
         nome: item.quanome,
         descricao: item.quadesc,
+        favorito: item.favorito === 1,
         tarefas: []
       });
     }
@@ -235,6 +244,7 @@ async function buscarQuadrosDoUsuario(usuid) {
 
   return Array.from(quadros.values());
 }
+
 
 async function buscarUsuarioPorId(id) {
     const conex = await conectarBD();
@@ -351,9 +361,23 @@ async function atualizarSenha(usuid, senha) {
   await conex.query(sql, [senha, usuid]);
 }
 
+async function atualizarBio(usuid, bio) {
+  const conex = await conectarBD();
+  const sql = "UPDATE usuarios SET usubio = ? WHERE usuid = ?"
+  await conex.query(sql, [bio, usuid]);
+}
+
+async function marcarQuadroFavorito(quaid, favorito) {
+  const conex = await conectarBD();
+  const sql = 'UPDATE quadros SET favorito = ? WHERE quaid = ?';
+  const valorFavorito = favorito ? 1 : 0;
+  return await conex.query(sql, [valorFavorito, quaid]);
+}
+
+
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
-        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha }
+        verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio }
