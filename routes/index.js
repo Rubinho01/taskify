@@ -141,7 +141,65 @@ router.post('/board/:id/new-task', verificarSessao, async function (req, res, ne
   res.redirect(`/board/${quaid}`);
 });
 
+router.get('/board/:quaid/edit', verificarSessao, async (req, res) => {
+  const quaid = parseInt(req.params.quaid);
+  const usuid = global.usucodigo;
 
+  // Verifica se usuário tem acesso ao quadro
+  const podeEditar = await global.banco.verificarQuadro(quaid, usuid);
+  if (!podeEditar) return res.redirect('/boards');
+
+  // Busca dados atuais do quadro para preencher o formulário
+  const quadro = await global.banco.buscarQuadroId(quaid);
+  if (!quadro) return res.redirect('/boards');
+
+  res.render('boardEdit', { quadro, quaid, erro: null });
+});
+
+router.post('/board/:quaid/edit', verificarSessao, async (req, res) => {
+  const quaid = parseInt(req.params.quaid);
+  const usuid = global.usucodigo;
+
+  // Verifica se usuário tem acesso ao quadro
+  const podeEditar = await global.banco.verificarQuadro(quaid, usuid);
+  if (!podeEditar) return res.redirect('/boards');
+
+  // Pega os dados enviados do formulário
+  const { nomeQuadro, descQuadro } = req.body;
+
+  // Validação simples (pode melhorar depois)
+  if (!nomeQuadro || nomeQuadro.trim() === '') {
+    const quadro = await global.banco.buscarQuadroId(quaid);
+    return res.render('boardEdit', { quadro, quaid, erro: 'O nome do quadro é obrigatório.' });
+  }
+
+  try {
+    await global.banco.editarQuadro(quaid, nomeQuadro.trim(), descQuadro.trim());
+    res.redirect(`/board/${quaid}`);
+  } catch (err) {
+    console.error(err);
+    const quadro = await global.banco.buscarQuadroId(quaid);
+    res.render('boardEdit', { quadro, quaid, erro: 'Erro ao atualizar quadro. Tente novamente.' });
+  }
+});
+
+router.get('/board/:quaid/delete', verificarSessao, async (req, res) => {
+  const quaid = parseInt(req.params.quaid);
+  const usuid = global.usucodigo;
+
+  // Verifica se usuário tem acesso ao quadro
+  const podeExcluir = await global.banco.verificarQuadro(quaid, usuid);
+  if (!podeExcluir) return res.redirect('/boards');
+
+  try {
+    await global.banco.deletarQuadro(quaid);
+    res.redirect('/boards');
+  } catch (err) {
+    console.error(err);
+    // Pode redirecionar com mensagem de erro ou algo assim
+    res.redirect(`/board/${quaid}`);
+  }
+});
 
 /*GET TAREFA*/
 router.get('/board/:quaid/task/:tarid', verificarSessao, async function (req, res, next)

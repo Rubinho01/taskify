@@ -417,7 +417,19 @@ async function editarTarefa(tarid, tarnome, tardesc){
 
 }
 
+async function deletarQuadro(quaid){
+  const conex = await conectarBD();
+  await conex.query("DELETE FROM tarefas WHERE tarqua = ?", [quaid]);
+  await conex.query("DELETE FROM quadros_usuarios WHERE quaid = ?", [quaid]);
+  await conex.query("DELETE FROM quadros WHERE quaid = ?", [quaid]);
+  
+}
 
+async function editarQuadro(quaid, quanome, quadesc){
+  const conex = await conectarBD();
+  const sql = "UPDATE quadros SET quanome = ?, quadesc = ? WHERE quaid = ?"
+  await conex.query(sql,[quanome, quadesc, quaid])
+}
 
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
@@ -425,5 +437,5 @@ async function editarTarefa(tarid, tarnome, tardesc){
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
         verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes,
-        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa 
+        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro 
       }
