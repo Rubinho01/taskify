@@ -394,6 +394,29 @@ async function buscarUsuarioPorNome(nome)
   
 }
 
+async function deletarTarefa(tarid) {
+  const conex = await conectarBD();
+  const sql = "DELETE FROM tarefas WHERE tarid = ?";
+  await conex.query(sql, [tarid]);
+}
+
+async function buscarQuadroDaTarefa(tarid) {
+  const conex = await conectarBD();
+  const sql = "SELECT tarqua FROM tarefas WHERE tarid = ?";
+  const [rows] = await conex.query(sql, [tarid]);
+  if (rows.length > 0) {
+    return rows[0].tarqua;
+  }
+  return null;
+}
+
+async function editarTarefa(tarid, tarnome, tardesc){
+  const conex = await conectarBD();
+  const sql = "UPDATE tarefas SET tarnome = ?, tardesc = ? WHERE tarid = ?"
+  await conex.query(sql,[tarnome, tardesc, tarid]);
+
+}
+
 
 
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
@@ -402,5 +425,5 @@ async function buscarUsuarioPorNome(nome)
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
         verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes,
-        buscarUsuarioPorNome 
+        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa 
       }

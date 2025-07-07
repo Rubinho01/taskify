@@ -165,6 +165,43 @@ router.post('/task/:id/tarstauts', async function(req, res)
   res.redirect('back');
 });
 
+router.get('/task/:id/delete', verificarSessao, async function(req, res, next) {
+  const tarid = parseInt(req.params.id);
+  const quaid = await global.banco.buscarQuadroDaTarefa(tarid);
+  if (!quaid) {
+    return res.redirect('/boards');
+  }
+  await verificarQuadro(quaid, global.usucodigo, res);
+
+  await global.banco.deletarTarefa(tarid);
+  res.redirect(`/board/${quaid}`);
+});
+
+router.get('/task/:id/edit', verificarSessao, async function (req, res, next) {
+  const tarid = parseInt(req.params.id);
+  const quaid = await global.banco.buscarQuadroDaTarefa(tarid);
+  if (!quaid) {
+    return res.redirect('/boards');
+  }
+  await verificarQuadro(quaid, global.usucodigo, res);
+  const tarefa = await global.banco.buscarTarefaDoQuadro(quaid, tarid);
+  if (!tarefa) {
+    return res.redirect('/boards');
+  }
+  res.render('taskEdit', { tarefa, quaid });
+});
+
+router.post('/task/:id/edit', verificarSessao, async function (req, res, next) {
+  const tarid = parseInt(req.params.id);
+  const { tarnome, tardesc } = req.body;
+  const quaid = await global.banco.buscarQuadroDaTarefa(tarid);
+  if (!quaid) {
+    return res.redirect('/boards');
+  }
+  await verificarQuadro(quaid, global.usucodigo, res);
+  await global.banco.editarTarefa(tarid, tarnome, tardesc);
+  res.redirect(`/board/${quaid}/task/${tarid}`);
+});
 
 
 router.get('/dashboard', verificarSessao, async function(req, res) 
