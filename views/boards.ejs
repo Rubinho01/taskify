@@ -8,13 +8,11 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(to bottom right, #f1cfcf, #f1cfcf);
       display: flex;
       min-height: 100vh;
-     
       overflow-x: visible;
       margin: 0; 
     }
@@ -42,16 +40,16 @@
     }
 
     .board-container {
-    background-color: #f1cfcf;
-    border-radius: 18px;
-    display: flex;
-   padding: 24px;
-    gap: 20px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
+      background-color: #f1cfcf;
+      border-radius: 18px;
+      display: flex;
+      padding: 24px;
+      gap: 20px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
 
     .column {
       background-color: #fff6f6;
@@ -64,6 +62,8 @@
       flex-direction: column;
       cursor: pointer;
       transition: transform 0.2s ease;
+      position: relative;
+      align-self: flex-start;
     }
 
     .column:hover {
@@ -117,19 +117,32 @@
       }
     }
 
-      .favorite-board-btn {
+    .favorite-board-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       background: none;
       border: none;
       padding: 0;
-      margin-left: 8px;
       color: gold;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       transition: color 0.2s;
+      z-index: 2;
     }
+
     .favorite-board-btn:hover {
       color: orange;
     }
+
+    .hidden-task {
+  display: none;
+}
+.mostrar-mais-btn {
+  margin-top: 8px;
+  align-self: center;
+  font-size: 0.8rem;
+}
   </style>
 </head>
 <body>
@@ -141,8 +154,15 @@
 
     <div class="board-container">
       <% quadrosUsuario.forEach(function(quadro) { %>
-        <div class="column" style="position: relative;">
-          <!-- A área que redireciona -->
+        <div class="column">
+          <button class="favorite-board-btn" 
+                  data-board-id="<%= quadro.id %>" 
+                  title="Favorite"
+                  aria-label="Favorite">
+            <i class="bi <%= quadro.favorito ? 'bi-star-fill' : 'bi-star' %>"></i>
+          </button>
+
+          <!-- Área clicável -->
           <div onclick="location.href='/board/<%= quadro.id %>'" style="cursor:pointer;">
             <h3 style="display: flex; align-items: center;">
               <strong>Name:</strong> 
@@ -154,32 +174,30 @@
             </p>
             <% if (quadro.tarefas.length > 0) { %>
               <p><strong>Tasks:</strong></p>
-              <% quadro.tarefas.forEach(function(tarefa) { %>
-                <div class="task-card">
-                  <div class="card-content">
-                    <input type="checkbox" <%= tarefa.status === 1  ? 'checked' : '' %> disabled>
-                    <label><%= tarefa.nome %></label>
-                  </div>
-                </div>
-              <% }) %>
+              <div class="tarefa-lista">
+  <% quadro.tarefas.forEach(function(tarefa, index) { %>
+    <div class="task-card <%= index >= 6 ? 'hidden-task' : '' %>">
+      <div class="card-content">
+        <input type="checkbox" <%= tarefa.status === 1 ? 'checked' : '' %> disabled>
+        <label><%= tarefa.nome %></label>
+      </div>
+    </div>
+  <% }) %>
+
+  <% if (quadro.tarefas.length > 6) { %>
+    <button class="mostrar-mais-btn btn btn-sm btn-outline-secondary">Mostrar mais</button>
+  <% } %>
+</div>
             <% } else { %>
               <p><strong>Tasks:</strong> <em>No tasks registered.</em></p>
             <% } %>
           </div>
-
-          <button class="favorite-board-btn" 
-                  data-board-id="<%= quadro.id %>" 
-                  title="Favorite"
-                  aria-label="Favorite">
-            <i class="bi <%= quadro.favorito ? 'bi-star-fill' : 'bi-star' %>"></i>
-          </button>
         </div>
       <% }) %>
     </div>
   </div>
 
   <script>
-    // Adiciona evento para todos os botões de favorito
     document.querySelectorAll('.favorite-board-btn').forEach(btn => {
       btn.addEventListener('click', async function(e) {
         e.preventDefault();
@@ -208,5 +226,17 @@
       });
     });
   </script>
+
+  <script>
+  document.querySelectorAll('.mostrar-mais-btn').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation(); // <- Impede que o clique propague e abra o quadro
+      const taskList = this.closest('.tarefa-lista');
+      taskList.querySelectorAll('.hidden-task').forEach(task => task.style.display = 'flex');
+      this.style.display = 'none'; // esconde o botão depois de clicar
+    });
+  });
+</script>
+
 </body>
 </html>
