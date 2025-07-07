@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Boards</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #f1cfcf, #f1cfcf);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: visible;
+      margin: 0; 
+    }
+
+    aside {
+      width: 240px;
+      background-color: #f1cfcf;
+      border-right: 1px solid #f1cfcf;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-x: visible;
+    }
+
+    .board-container {
+      background-color: #f1cfcf;
+      border-radius: 18px;
+      display: flex;
+      padding: 24px;
+      gap: 20px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .column {
+      background-color: #fff6f6;
+      border-radius: 18px;
+      padding: 16px;
+      width: 260px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      position: relative;
+      align-self: flex-start;
+    }
+
+    .column:hover {
+      transform: scale(1.05);
+    }
+
+    .column h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #222;
+    }
+
+    .task-card {
+      background-color: white;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-content {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    @media (max-width: 1024px) {
+      .column {
+        width: 220px;
+      }
+      aside {
+        width: 200px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      aside {
+        display: none;
+      }
+      .main {
+        flex: 1 1 100%;
+      }
+      .board-container {
+        padding: 12px;
+      }
+      .column {
+        width: 200px;
+      }
+    }
+
+    .favorite-board-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      padding: 0;
+      color: gold;
+      cursor: pointer;
+      font-size: 1.4rem;
+      transition: color 0.2s;
+      z-index: 2;
+    }
+
+    .favorite-board-btn:hover {
+      color: orange;
+    }
+
+    .hidden-task {
+  display: none;
+}
+.mostrar-mais-btn {
+  margin-top: 8px;
+  align-self: center;
+  font-size: 0.8rem;
+}
+  </style>
+</head>
+<body>
+
+  <%- include('LifeQuality/sidebar') %>
+
+  <div class="main">
+    <%- include('LifeQuality/header') %>
+
+<div class="board-container">
+  <% quadrosUsuario.filter(q => q.favorito).forEach(function(quadro) { %>
+    <div class="column">
+      <button class="favorite-board-btn" 
+              data-board-id="<%= quadro.id %>" 
+              title="Favorite"
+              aria-label="Favorite">
+        <i class="bi <%= quadro.favorito ? 'bi-star-fill' : 'bi-star' %>"></i>
+      </button>
+      <div onclick="location.href='/board/<%= quadro.id %>'" style="cursor:pointer;">
+        <h3 style="display: flex; align-items: center;">
+          <strong>Name:</strong> 
+          <span style="text-decoration: underline; color: red; margin-left: 8px;"><%= quadro.nome %></span>
+        </h3>
+        <p>
+          <strong>Description:</strong> 
+          <span style="text-decoration: underline; color: red;"><%= quadro.descricao %></span>
+        </p>
+        <% if (quadro.tarefas.length > 0) { %>
+          <p><strong>Tasks:</strong></p>
+          <div class="tarefa-lista">
+            <% quadro.tarefas.forEach(function(tarefa, index) { %>
+              <div class="task-card <%= index >= 6 ? 'hidden-task' : '' %>">
+                <div class="card-content">
+                  <input type="checkbox" <%= tarefa.status === 1 ? 'checked' : '' %> disabled>
+                  <label><%= tarefa.nome %></label>
+                </div>
+              </div>
+            <% }) %>
+
+            <% if (quadro.tarefas.length > 6) { %>
+              <button class="mostrar-mais-btn btn btn-sm btn-outline-secondary">Show More</button>
+            <% } %>
+          </div>
+        <% } else { %>
+          <p><strong>Tasks:</strong> <em>No tasks registered.</em></p>
+        <% } %>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+  <% if (quadro.tarefas.length > 6) { %>
+    <button class="mostrar-mais-btn btn btn-sm btn-outline-secondary">Show More</button>
+  <% } %>
+</div>
+            <% } else { %>
+              <p><strong>Tasks:</strong> <em>No tasks registered.</em></p>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.favorite-board-btn').forEach(btn => {
+      btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation(); 
+
+        const icon = this.querySelector('i');
+        const boardId = this.getAttribute('data-board-id');
+        const isFavorited = icon.classList.contains('bi-star-fill');
+
+        try {
+          const response = await fetch(`/board/${boardId}/favorite`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ favorito: !isFavorited })
+          });
+
+          if (response.ok) {
+            icon.classList.toggle('bi-star-fill');
+            icon.classList.toggle('bi-star');
+          } else {
+            alert('Fail to favorite.');
+          }
+        } catch (err) {
+          alert('Network error.');
+        }
+      });
+    });
+  </script>
+
+  <script>
+  document.querySelectorAll('.mostrar-mais-btn').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation(); // 
+      const taskList = this.closest('.tarefa-lista');
+      taskList.querySelectorAll('.hidden-task').forEach(task => task.style.display = 'flex');
+      this.style.display = 'none';
+    });
+  });
+</script>
+
+</body>
+</html>

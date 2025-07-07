@@ -431,11 +431,49 @@ async function editarQuadro(quaid, quanome, quadesc){
   await conex.query(sql,[quanome, quadesc, quaid])
 }
 
+async function adicionarFavorito(usuid, quaid) {
+  const conex = await conectarBD();
+  const sql = 'INSERT INTO favoritos (usuid, quaid) VALUES (?, ?)';
+  await conex.query(sql, [usuid, quaid]);
+}
+
+// Remover favorito
+async function removerFavorito(usuid, quaid) {
+  const conex = await conectarBD();
+  const sql = 'DELETE FROM favoritos WHERE usuid = ? AND quaid = ?';
+  await conex.query(sql, [usuid, quaid]);
+}
+
+// Verifica quais quadros são favoritados pelo usuário
+async function listarQuadrosFavoritos(usuid) {
+  const conex = await conectarBD();
+  const sql = `
+    SELECT q.*
+    FROM quadros q
+    JOIN favoritos f ON q.quaid = f.quaid
+    WHERE f.usuid = ?`;
+  const [rows] = await conex.query(sql, [usuid]);
+  return rows;
+}
+
+// Ver todos os quadros com info se é favoritado
+async function listarQuadrosComFavorito(usuid) {
+  const conex = await conectarBD();
+  const sql = `
+    SELECT q.*, 
+           IF(f.usuid IS NULL, 0, 1) AS favorito
+    FROM quadros q
+    LEFT JOIN favoritos f ON q.quaid = f.quaid AND f.usuid = ?`;
+  const [rows] = await conex.query(sql, [usuid]);
+  return rows;
+}
+
+
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
         verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes,
-        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro 
+        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro, adicionarFavorito, removerFavorito, listarQuadrosFavoritos, listarQuadrosComFavorito
       }

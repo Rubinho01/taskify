@@ -65,6 +65,7 @@ router.get('/boards', verificarSessao, async function (req, res){
   const usuid = global.usucodigo;
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   global.quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
+  const quadrosFavoritos = await global.banco.listarQuadrosFavoritos(global.usucodigo)
   console.log(quadrosUsuario);
   global.notificacoes = await global.banco.verificarNotificacoes(global.usucodigo);
   console.log("Notificações: " + global.notificacoes);
@@ -472,17 +473,39 @@ router.get('/perfilview', verificarSessao, async function (req, res, next) {
   });
 });
 
-router.post('/board/:id/favorite', verificarSessao, async function(req, res) {
+router.post('/board/:id/favorite', async (req, res) => {
+  const usuid = global.usucodigo;
   const quaid = parseInt(req.params.id);
   const { favorito } = req.body;
 
   try {
-    await global.banco.marcarQuadroFavorito(quaid, favorito);
-    res.status(200).json({ ok: true });
-  } catch (error) {
-    console.error("Erro ao favoritar quadro:", error);
-    res.status(500).json({ ok: false, erro: "Erro interno ao atualizar favorito." });
+    if (favorito) {
+      await banco.adicionarFavorito(usuid, quaid);
+    } else {
+      await banco.removerFavorito(usuid, quaid);
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao atualizar favorito');
   }
+});
+
+
+router.get('/favorites', verificarSessao, async function (req, res) {
+  const usuid = global.usucodigo;
+
+  const todosQuadros = await global.banco.buscarQuadrosDoUsuario(usuid);
+  const quadrosFavoritos = todosQuadros.filter(q => q.favorito === true);
+
+  global.notificacoes = await global.banco.verificarNotificacoes(usuid);
+
+  res.render('boards', {
+    nome: global.usunome,
+    quadrosUsuario: quadrosFavoritos,
+    quadro: null,
+    notificacoes: global.notificacoes
+  });
 });
 
 
