@@ -6,6 +6,7 @@
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 
 > Um app colaborativo para organização de quadros, com amizades, convites e tarefas em grupo.
+> Alunos: Rubem Krüger, Nicolas de Sá e Eduardo de Oliveira
 
 ---
 
@@ -53,7 +54,7 @@ cd taskify
 npm install
 
 # 3. Configure o banco de dados (MySQL/MariaDB)
-# Crie o banco e importe as tabelas conforme estrutura acima
+# Importe o banco presente na pasta "databaseHere!"
 
 # 4. Inicie o servidor
 npm start
