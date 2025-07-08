@@ -69,6 +69,15 @@ router.get('/boards', verificarSessao, async function (req, res){
   console.log(quadrosUsuario);
   global.notificacoes = await global.banco.verificarNotificacoes(global.usucodigo);
   console.log("Notificações: " + global.notificacoes);
+  const amizades = await global.banco.buscarAmigosUsuario(global.usucodigo);
+  global.amigos = [];
+  for (const amizade of amizades) {
+    const amigoId = amizade.amienvia === global.usucodigo ? amizade.amirecebe : amizade.amienvia;
+    const amigo = await global.banco.buscarUsuarioPorId(amigoId);
+    if (amigo) {
+      global.amigos.push(amigo);
+    }
+  }
   res.render('boards', { 
     nome: global.usunome, quadrosUsuario, quadro: null, notificacoes: global.notificacoes });
 });
@@ -122,7 +131,7 @@ router.get('/board/:id', verificarSessao, async function(req, res, next) {
   const tarefas = await global.banco.buscarTarefasQuadro(quaid);
   console.log("TAREFAS:");
   console.log(tarefas);
-  return res.render('board',{nome: global.usunome, quadro, quadrosUsuario, tarefas});
+  return res.render('board',{nome: global.usunome, quadro, quadrosUsuario, tarefas, notificacoes: global.notificacoes});
 });
 
 /*GET NOVA TAREFA*/
@@ -151,8 +160,9 @@ router.get('/board/:quaid/edit', verificarSessao, async (req, res) => {
 
   const quadro = await global.banco.buscarQuadroId(quaid);
   if (!quadro) return res.redirect('/boards');
+  const amigos = await global.banco.buscarAmigosNaoNoQuadro(global.usucodigo, quaid);
 
-  res.render('boardEdit', { quadro, quaid, erro: null });
+  res.render('boardEdit', { quadro, quaid, erro: null, amigos});
 });
 
 router.post('/board/:quaid/edit', verificarSessao, async (req, res) => {
@@ -263,7 +273,8 @@ router.get('/dashboard', verificarSessao, async function(req, res)
   totalQuadros: contagem.totalQuadros,
   totalTarefas: contagem.totalTarefas,
   tarefasConcluidas: contagem.tarefasConcluidas,
-  tarefasNaoConcluidas: contagem.tarefasNaoConcluidas
+  tarefasNaoConcluidas: contagem.tarefasNaoConcluidas,
+  notificacoes: global.notificacoes
 });
 });
 
@@ -309,7 +320,7 @@ router.get('/friends', verificarSessao, async function (req, res, next)
 
   if(!amizades && amizades.lenght<1)
   {
-    return res.render('friends', {amigos: global.amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: null});
+    return res.render('friends', {amigos: global.amigos, quadrosUsuario: global.quadrosUsuario, quadro: null, nome:global.usunome, erro: null, notificacoes: global.notificacoes});
   }
 
   for (const amizade of amizades) {
@@ -459,7 +470,7 @@ router.get('/perfilview', verificarSessao, async function (req, res, next) {
     quadrosUsuario,       
     quadro: null,          
     mensagem: null,
-    sucesso: null
+    sucesso: null, notificacoes: global.notificacoes
   });
 });
 
@@ -480,6 +491,16 @@ router.post('/board/:id/favorite', async (req, res) => {
     res.status(500).send('Erro ao atualizar favorito');
   }
 });
+
+router.post('/add/board/:quaid/user/:id', verificarSessao, async (req, res) => {
+  const { quaid, id } = req.params;
+  const amizadeExiste = await global.banco.verificarAmizade(global.usucodigo, id);
+  if (amizadeExiste) {
+    await global.banco.adicionarUsuarioAoQuadro(quaid, id);
+  }
+  res.redirect('back');
+});
+
 
 
 router.get('/favorites', verificarSessao, async function (req, res) {
