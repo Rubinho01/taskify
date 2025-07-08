@@ -25,7 +25,7 @@ app.use('/admin', (req, res, next) => {
   console.log('Chegou em /admin');
   next();
 }, adminRouter);
-
+app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

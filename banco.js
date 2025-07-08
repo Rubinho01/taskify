@@ -261,15 +261,20 @@ async function registrarPedidoAmizade(usuid, amiId){
     await conex.query(sql,[usuid, amiId]);
     
 }
-async function verificarAmizade(usucodigo, amiid){
-    const conex = await conectarBD();
-    const sql = `SELECT * FROM amizades where amienvia = ? and amirecebe = ?
-                OR
-                amienvia= ? and amirecebe= ?`;
-    const [verificarAmizade] = await conex.query(sql,[usucodigo, amiid, amiid, usucodigo])
-    if(verificarAmizade.length>0) return verificarAmizade[0];
-    else return {};
+async function verificarAmizade(usucodigo, amiid) {
+  const conex = await conectarBD();
+  const sql = `
+    SELECT * FROM amizades 
+    WHERE 
+      (amienvia = ? AND amirecebe = ?)
+      OR 
+      (amienvia = ? AND amirecebe = ?)
+  `;
+  const [verificarAmizade] = await conex.query(sql, [usucodigo, amiid, amiid, usucodigo]);
+  if (verificarAmizade.length > 0) return verificarAmizade[0];
+  else return {};
 }
+
 async function contagemDashboardUsuario(usuid){
   const conexao = await conectarBD();
 
@@ -431,11 +436,37 @@ async function editarQuadro(quaid, quanome, quadesc){
   await conex.query(sql,[quanome, quadesc, quaid])
 }
 
+async function adicionarUsuarioAoQuadro(quaid, id) {
+  const conex = await conectarBD();
+  const sql = "INSERT INTO quadros_usuarios(quaid, usuid) values (?,?)"
+  await conex.query(sql,[quaid, id]);
+  
+}
+async function buscarAmigosNaoNoQuadro(usuId, quaid) {
+  const conex = await conectarBD();
+  const sql = `
+    SELECT u.*
+    FROM usuarios u
+    JOIN amizades a 
+      ON (
+       (a.amienvia = u.usuid AND a.amirecebe = ?) OR
+        (a.amirecebe = u.usuid AND a.amienvia = ?)
+      )
+    WHERE a.amipendente = 0
+    AND u.usuid NOT IN (
+      SELECT usuid 
+      FROM quadros_usuarios 
+      WHERE quaid = ?
+);`;
+  const [amigosDisponiveis] = await conex.query(sql, [usuId, usuId, quaid]);
+  return amigosDisponiveis;
+}
+
     module.exports = { conectarBD, buscarUsuario, registrarUsuario, buscarAdmin, registrarQuadro, 
         RegistrarQuaUsu, verificarQuadro, contagemDashboard, buscarQuadroId, buscarQuadrosUsuario,
         registrarTarefa, buscarTarefasQuadro, buscarTarefaDoQuadro, atualizarStatusTarefa, listarAdmin,
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
         verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes,
-        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro 
+        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro, adicionarUsuarioAoQuadro, buscarAmigosNaoNoQuadro 
       }
