@@ -76,7 +76,7 @@
     <%- include('LifeQuality/header') %>
 
     <div class="profile-container">
-      <h2>Dados do Perfil</h2>
+      <h2>Profile Information</h2>
 
       <% if (mensagem) { %>
         <div class="alert <%= sucesso ? 'alert-success' : 'alert-danger' %> alert-dismissible fade show" role="alert">
@@ -97,7 +97,7 @@
             required
             style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
           />
-          <div class="invalid-feedback">Por favor, informe seu nome.</div>
+          <div class="invalid-feedback">Please, inform your name.</div>
         </div>
 
         <div class="mb-3">
@@ -111,7 +111,7 @@
             required
             style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
           />
-          <div class="invalid-feedback">Por favor, informe um e-mail válido.</div>
+          <div class="invalid-feedback">Please inform your e-mail.</div>
         </div>
 
         <div class="mb-4">
@@ -121,19 +121,19 @@
             id="senha"
             name="senha"
             class="form-control"
-            placeholder="Digite nova senha (opcional)"
+            placeholder="Enter new password (optional)"
             style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
           />
-          <small class="text-muted">Deixe em branco para manter a senha atual.</small>
+          <small class="text-muted">Leave blank to keep the current password.</small>
         </div>
         <div class="mb-4">
-          <label for="bio" class="form-label fw-medium">Biografia (opcional)</label>
+          <label for="bio" class="form-label fw-medium">Biography (optional)</label>
             <textarea
               id="bio"
               name="bio"
               class="form-control"
               rows="4"
-              placeholder="Escreva um pouco sobre você..."
+              placeholder="Write a little about yourself..."
               style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
             ><%= usuario.usubio || '' %></textarea>
         </div>
@@ -145,14 +145,14 @@
     id="senhaAtual"
     name="senhaAtual"
     class="form-control"
-    placeholder="Digite sua senha atual para confirmar"
+    placeholder="Enter your current password to confirm"
     required
     style="border-radius: 8px; border: 1px solid #ccc; padding: 0.5rem 0.75rem;"
   />
-  <div class="invalid-feedback">Você precisa informar sua senha atual para confirmar as alterações.</div>
+  <div class="invalid-feedback">You need to enter your current password to confirm the changes.</div>
 </div>
         <button type="submit" class="btn btn-danger w-100 fw-semibold" style="padding: 0.5rem 0;">
-          Salvar Alterações
+          Save Changes
         </button>
       </form>
     </div>

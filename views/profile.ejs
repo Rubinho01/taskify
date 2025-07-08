@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quadros</title>
+  <title>View Profile</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(to bottom right, #f1cfcf, #f1cfcf);
       display: flex;
       min-height: 100vh;
-     
+      margin: 0;
       overflow-x: visible;
-      margin: 0; 
     }
 
     aside {
@@ -38,83 +37,29 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow-x: visible;
     }
 
-    .board-container {
-    background-color: #f1cfcf;
-    border-radius: 18px;
-    display: flex;
-   padding: 24px;
-    gap: 20px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
-
-    .column {
-      background-color: #fff6f6;
-      border-radius: 18px;
-      padding: 16px;
-      width: 260px;
-      flex-shrink: 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-      transition: transform 0.2s ease;
+    .container {
+      margin-top: 4rem;
     }
 
-    .column:hover {
-      transform: scale(1.05);
+    .bio-box {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .column h3 {
-      font-size: 16px;
-      margin-bottom: 12px;
-      color: #222;
-    }
-
-    .task-card {
-      background-color: white;
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-content {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    @media (max-width: 1024px) {
-      .column {
-        width: 220px;
-      }
-      aside {
-        width: 200px;
-      }
+    .bio-box h5 {
+      font-weight: 600;
+      color: #e61313;
     }
 
     @media (max-width: 768px) {
-      aside {
-        display: none;
-      }
-      .main {
-        flex: 1 1 100%;
-      }
-      .board-container {
-        padding: 12px;
-      }
-      .column {
-        width: 200px;
-      }
+      aside { display: none; }
+      .main { flex: 1 1 100%; }
     }
   </style>
 </head>
@@ -125,45 +70,50 @@
   <div class="main">
     <%- include('LifeQuality/header') %>
 
-  <div class="container mt-4">
-    <div class="card shadow-sm" style="border-radius: 18px;">
-        <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="card-title mb-1"><strong>Name:</strong> <%= usuario.usunome %></h4>
-            <p class="card-text text-muted mb-0"><i class="bi bi-person-circle"></i> Public Profile</p>
-        </div>
-        <% if (verificarAmizade.amipendente === 1) { %>
-            <button type="submit" class="btn btn-danger rounded-pill">
-                <i class="bi bi-person-plus-fill me-1"></i> Pending
+    <div class="container">
+  <a href="javascript:history.back()" class="btn btn-outline-danger mb-3 rounded-pill">
+  <i class="bi bi-arrow-left-circle me-1"></i> Back
+</a>
+
+  <div class="card shadow-sm" style="border-radius: 18px;">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <h4 class="card-title mb-1"><strong>Name:</strong> <%= usuario.usunome %></h4>
+        <p class="card-text text-muted mb-0"><i class="bi bi-person-circle"></i> Public Profile</p>
+      </div>
+
+          <% if (verificarAmizade.amipendente === 1) { %>
+            <button type="button" class="btn btn-danger rounded-pill" disabled>
+              <i class="bi bi-hourglass-split me-1"></i> Pending
             </button>
-              <% }else if (verificarAmizade.amipendente === 0) { %>
-            <button type="submit" class="btn btn-danger rounded-pill">
-                <i class=" me-1"></i> Friends
+          <% } else if (verificarAmizade.amipendente === 0) { %>
+            <button type="button" class="btn btn-danger rounded-pill" disabled>
+              <i class="bi bi-check-circle-fill me-1"></i> Friends
             </button>
-        <% }else {%>
-        <form action="/profile/<%= usuario.usuid %>/add-friend" method="POST">
-            <button type="submit" class="btn btn-danger rounded-pill">
+          <% } else { %>
+            <form action="/profile/<%= usuario.usuid %>/add-friend" method="POST">
+              <button type="submit" class="btn btn-danger rounded-pill">
                 <i class="bi bi-person-plus-fill me-1"></i> Add Friend
-            </button>
-        </form>
-        <% } %>
-     </div>
+              </button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="bio-box">
+        <h5>Biography</h5>
+        <hr>
+        <p class="mt-3">
+          <% if (usuario.usubio && usuario.usubio.trim()) { %>
+            <%= usuario.usubio %>
+          <% } else { %>
+            <em>This user doesn't have a Bio yet.</em>
+          <% } %>
+        </p>
+      </div>
     </div>
-   </div>
+  </div>
 
-  <script>
-    const userIcon = document.getElementById("userIcon");
-    const userMenu = document.getElementById("userMenu");
-
-    userIcon.addEventListener("click", () => {
-      userMenu.style.display = userMenu.style.display === "block" ? "none" : "block";
-    });
-
-    document.addEventListener("click", function (e) {
-      if (!userIcon.contains(e.target) && !userMenu.contains(e.target)) {
-        userMenu.style.display = "none";
-      }
-    });
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

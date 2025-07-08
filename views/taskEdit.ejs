@@ -131,11 +131,11 @@
 <body>
 
   <div class="container">
-    <div class="title">Editar Tarefa</div>
+    <div class="title">Edit Task</div>
 
     <form action="/task/<%= tarefa.tarid %>/edit" method="post" novalidate>
       <div class="mb-4">
-        <label for="tarnome">Nome da Tarefa:</label>
+        <label for="tarnome">Task Name:</label>
         <input
           type="text"
           id="tarnome"
@@ -148,7 +148,7 @@
       </div>
 
       <div class="mb-4">
-        <label for="tardesc">Descrição:</label>
+        <label for="tardesc">Description:</label>
         <textarea
           id="tardesc"
           name="tardesc"
@@ -157,8 +157,8 @@
         ><%= tarefa.tardesc %></textarea>
       </div>
 
-      <button type="submit" class="submit-btn">Salvar Alterações</button>
-      <button type="button" class="cancel-btn" onclick="location.href='/board/<%= quaid %>'">Cancelar</button>
+      <button type="submit" class="submit-btn">Save Changes</button>
+      <button type="button" class="cancel-btn" onclick="location.href='/board/<%= quaid %>'">Cancel</button>
 
     </form>
   </div>

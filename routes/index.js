@@ -65,6 +65,7 @@ router.get('/boards', verificarSessao, async function (req, res){
   const usuid = global.usucodigo;
   const quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
   global.quadrosUsuario = await global.banco.buscarQuadrosDoUsuario(global.usucodigo);
+  const quadrosFavoritos = await global.banco.listarQuadrosFavoritos(global.usucodigo)
   console.log(quadrosUsuario);
   global.notificacoes = await global.banco.verificarNotificacoes(global.usucodigo);
   console.log("Notificações: " + global.notificacoes);
@@ -154,11 +155,9 @@ router.get('/board/:quaid/edit', verificarSessao, async (req, res) => {
   const quaid = parseInt(req.params.quaid);
   const usuid = global.usucodigo;
 
-  // Verifica se usuário tem acesso ao quadro
   const podeEditar = await global.banco.verificarQuadro(quaid, usuid);
   if (!podeEditar) return res.redirect('/boards');
 
-  // Busca dados atuais do quadro para preencher o formulário
   const quadro = await global.banco.buscarQuadroId(quaid);
   if (!quadro) return res.redirect('/boards');
   const amigos = await global.banco.buscarAmigosNaoNoQuadro(global.usucodigo, quaid);
@@ -170,14 +169,11 @@ router.post('/board/:quaid/edit', verificarSessao, async (req, res) => {
   const quaid = parseInt(req.params.quaid);
   const usuid = global.usucodigo;
 
-  // Verifica se usuário tem acesso ao quadro
   const podeEditar = await global.banco.verificarQuadro(quaid, usuid);
   if (!podeEditar) return res.redirect('/boards');
 
-  // Pega os dados enviados do formulário
   const { nomeQuadro, descQuadro } = req.body;
 
-  // Validação simples (pode melhorar depois)
   if (!nomeQuadro || nomeQuadro.trim() === '') {
     const quadro = await global.banco.buscarQuadroId(quaid);
     return res.render('boardEdit', { quadro, quaid, erro: 'O nome do quadro é obrigatório.' });
@@ -196,8 +192,6 @@ router.post('/board/:quaid/edit', verificarSessao, async (req, res) => {
 router.get('/board/:quaid/delete', verificarSessao, async (req, res) => {
   const quaid = parseInt(req.params.quaid);
   const usuid = global.usucodigo;
-
-  // Verifica se usuário tem acesso ao quadro
   const podeExcluir = await global.banco.verificarQuadro(quaid, usuid);
   if (!podeExcluir) return res.redirect('/boards');
 
@@ -206,18 +200,15 @@ router.get('/board/:quaid/delete', verificarSessao, async (req, res) => {
     res.redirect('/boards');
   } catch (err) {
     console.error(err);
-    // Pode redirecionar com mensagem de erro ou algo assim
     res.redirect(`/board/${quaid}`);
   }
 });
 
-/*GET TAREFA*/
 router.get('/board/:quaid/task/:tarid', verificarSessao, async function (req, res, next)
 {
   const {quaid, tarid} = req.params;
   verificarQuadro(quaid, global.usucodigo, res);
-  
-  //VERIFICAR TAREFA
+
   const tarefa = await global.banco.buscarTarefaDoQuadro(quaid, tarid);
   if (!tarefa) res.redirect('/boards');
 
@@ -431,7 +422,7 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
         nome: usuario.usunome,
         quadrosUsuario,
         quadro: null,
-        mensagem: 'Senha atual incorreta. Nenhuma alteração foi realizada.',
+        mensagem: 'Incorrect current password. No changes were made.',
         sucesso: false
       });
     }
@@ -440,22 +431,22 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
 
     if (nome && nome !== usuario.usunome) {
       await global.banco.atualizarNome(usuid, nome);
-      mensagens.push('Nome atualizado com sucesso!');
+      mensagens.push('Name updated successfully!');
     }
 
     if (email && email !== usuario.usuemail) {
       await global.banco.atualizarEmail(usuid, email);
-      mensagens.push('E-mail atualizado com sucesso!');
+      mensagens.push('E-mail updated successfully!');
     }
 
     if (senha) {
       await global.banco.atualizarSenha(usuid, senha);
-      mensagens.push('Senha atualizada com sucesso!');
+      mensagens.push('Password updated successfully!');
     }
 
     if (bio !== undefined && bio !== usuario.usubio) {
       await global.banco.atualizarBio(usuid, bio)
-      mensagens.push('Biografia atualizada com sucesso!')
+      mensagens.push('Biography updated successfully!')
     }
 
     const usuarioAtualizado = await global.banco.buscarUsuarioPorId(usuid);
@@ -465,7 +456,7 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
       nome: usuarioAtualizado.usunome,
       quadrosUsuario,
       quadro: null,
-      mensagem: mensagens.length ? mensagens.join(' ') : 'Nenhuma alteração realizada.',
+      mensagem: mensagens.length ? mensagens.join(' ') : 'No changes were made.',
       sucesso: true
     });
 });
@@ -483,16 +474,21 @@ router.get('/perfilview', verificarSessao, async function (req, res, next) {
   });
 });
 
-router.post('/board/:id/favorite', verificarSessao, async function(req, res) {
+router.post('/board/:id/favorite', async (req, res) => {
+  const usuid = global.usucodigo;
   const quaid = parseInt(req.params.id);
   const { favorito } = req.body;
 
   try {
-    await global.banco.marcarQuadroFavorito(quaid, favorito);
-    res.status(200).json({ ok: true });
-  } catch (error) {
-    console.error("Erro ao favoritar quadro:", error);
-    res.status(500).json({ ok: false, erro: "Erro interno ao atualizar favorito." });
+    if (favorito) {
+      await banco.adicionarFavorito(usuid, quaid);
+    } else {
+      await banco.removerFavorito(usuid, quaid);
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao atualizar favorito');
   }
 });
 
@@ -505,6 +501,23 @@ router.post('/add/board/:quaid/user/:id', verificarSessao, async (req, res) => {
   res.redirect('back');
 });
 
+
+
+router.get('/favorites', verificarSessao, async function (req, res) {
+  const usuid = global.usucodigo;
+
+  const todosQuadros = await global.banco.buscarQuadrosDoUsuario(usuid);
+  const quadrosFavoritos = todosQuadros.filter(q => q.favorito === true);
+
+  global.notificacoes = await global.banco.verificarNotificacoes(usuid);
+
+  res.render('boards', {
+    nome: global.usunome,
+    quadrosUsuario: quadrosFavoritos,
+    quadro: null,
+    notificacoes: global.notificacoes
+  });
+});
 
 
 /* ERROS */

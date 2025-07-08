@@ -100,13 +100,14 @@ async function admin_listarUsuarios(){
 
 async function admin_removerUsuarios(id){
   const conexao = await conectarBD();
-
   const sql0 = "DELETE FROM tarefas WHERE tarusu = ?";
   await conexao.query(sql0, [id]);
-
   const sql1 = "DELETE FROM quadros_usuarios WHERE usuid = ?";
   await conexao.query(sql1, [id]);
-
+  const sqlAmizades = "DELETE FROM amizades WHERE amienvia = ? OR amirecebe = ?";
+  await conexao.query(sqlAmizades, [id, id]);
+  const sqlFavoritos = "DELETE FROM favoritos WHERE usuid = ?";
+  await conexao.query(sqlFavoritos, [id]);
   const sql2 = "DELETE FROM usuarios WHERE usuid = ?";
   await conexao.query(sql2, [id]);
 }
@@ -122,12 +123,16 @@ async function admin_listarQuadros(){
 async function admin_removerQuadros(quaid) {
   const conexao = await conectarBD();
 
+  const sql0 = 'DELETE FROM tarefas WHERE tarqua = ?';
+  await conexao.query(sql0, [quaid]);
+
   const sql1 = 'DELETE FROM quadros_usuarios WHERE quaid = ?';
   await conexao.query(sql1, [quaid]);
 
-  const sql2 = 'DELETE FROM quadros WHERE quaid = ?';
+  const sql2 = 'DELETE FROM quadros WHERE quaid = ?'; 
   await conexao.query(sql2, [quaid]);
 }
+
    
 async function registrarQuadro(nome, descricao) {
     const conex = await conectarBD();
@@ -436,6 +441,42 @@ async function editarQuadro(quaid, quanome, quadesc){
   await conex.query(sql,[quanome, quadesc, quaid])
 }
 
+async function adicionarFavorito(usuid, quaid) {
+  const conex = await conectarBD();
+  const sql = 'INSERT INTO favoritos (usuid, quaid) VALUES (?, ?)';
+  await conex.query(sql, [usuid, quaid]);
+}
+
+async function removerFavorito(usuid, quaid) {
+  const conex = await conectarBD();
+  const sql = 'DELETE FROM favoritos WHERE usuid = ? AND quaid = ?';
+  await conex.query(sql, [usuid, quaid]);
+}
+
+async function listarQuadrosFavoritos(usuid) {
+  const conex = await conectarBD();
+  const sql = `
+    SELECT q.*
+    FROM quadros q
+    JOIN favoritos f ON q.quaid = f.quaid
+    WHERE f.usuid = ?`;
+  const [rows] = await conex.query(sql, [usuid]);
+  return rows;
+}
+
+
+async function listarQuadrosComFavorito(usuid) {
+  const conex = await conectarBD();
+  const sql = `
+    SELECT q.*, 
+           IF(f.usuid IS NULL, 0, 1) AS favorito
+    FROM quadros q
+    LEFT JOIN favoritos f ON q.quaid = f.quaid AND f.usuid = ?`;
+  const [rows] = await conex.query(sql, [usuid]);
+  return rows;
+}
+
+
 async function adicionarUsuarioAoQuadro(quaid, id) {
   const conex = await conectarBD();
   const sql = "INSERT INTO quadros_usuarios(quaid, usuid) values (?,?)"
@@ -468,5 +509,7 @@ async function buscarAmigosNaoNoQuadro(usuId, quaid) {
         adicionarAdmin, admin_listarQuadros, admin_listarUsuarios, admin_removerQuadros, admin_removerUsuarios, removerAdmin, buscarQuadrosDoUsuario,
         contagemDashboardUsuario, buscarUsuarioPorId, registrarPedidoAmizade, verificarAmizade, buscarAmigosUsuario, removerAmizade, verificarAmizadesPendentes,  
         verificarPedidoDeAmizade, aceitarPedidoDeAmizade, atualizarNome, atualizarEmail, atualizarSenha, marcarQuadroFavorito, atualizarBio, verificarNotificacoes,
-        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro, adicionarUsuarioAoQuadro, buscarAmigosNaoNoQuadro 
+        buscarUsuarioPorNome, deletarTarefa, buscarQuadroDaTarefa, editarTarefa, editarQuadro, deletarQuadro, adicionarUsuarioAoQuadro, buscarAmigosNaoNoQuadro , adicionarFavorito, 
+        removerFavorito, listarQuadrosFavoritos, listarQuadrosComFavorito
+
       }
