@@ -146,11 +146,9 @@ router.get('/board/:quaid/edit', verificarSessao, async (req, res) => {
   const quaid = parseInt(req.params.quaid);
   const usuid = global.usucodigo;
 
-  // Verifica se usuário tem acesso ao quadro
   const podeEditar = await global.banco.verificarQuadro(quaid, usuid);
   if (!podeEditar) return res.redirect('/boards');
 
-  // Busca dados atuais do quadro para preencher o formulário
   const quadro = await global.banco.buscarQuadroId(quaid);
   if (!quadro) return res.redirect('/boards');
 
@@ -161,14 +159,11 @@ router.post('/board/:quaid/edit', verificarSessao, async (req, res) => {
   const quaid = parseInt(req.params.quaid);
   const usuid = global.usucodigo;
 
-  // Verifica se usuário tem acesso ao quadro
   const podeEditar = await global.banco.verificarQuadro(quaid, usuid);
   if (!podeEditar) return res.redirect('/boards');
 
-  // Pega os dados enviados do formulário
   const { nomeQuadro, descQuadro } = req.body;
 
-  // Validação simples (pode melhorar depois)
   if (!nomeQuadro || nomeQuadro.trim() === '') {
     const quadro = await global.banco.buscarQuadroId(quaid);
     return res.render('boardEdit', { quadro, quaid, erro: 'O nome do quadro é obrigatório.' });
@@ -187,8 +182,6 @@ router.post('/board/:quaid/edit', verificarSessao, async (req, res) => {
 router.get('/board/:quaid/delete', verificarSessao, async (req, res) => {
   const quaid = parseInt(req.params.quaid);
   const usuid = global.usucodigo;
-
-  // Verifica se usuário tem acesso ao quadro
   const podeExcluir = await global.banco.verificarQuadro(quaid, usuid);
   if (!podeExcluir) return res.redirect('/boards');
 
@@ -197,18 +190,15 @@ router.get('/board/:quaid/delete', verificarSessao, async (req, res) => {
     res.redirect('/boards');
   } catch (err) {
     console.error(err);
-    // Pode redirecionar com mensagem de erro ou algo assim
     res.redirect(`/board/${quaid}`);
   }
 });
 
-/*GET TAREFA*/
 router.get('/board/:quaid/task/:tarid', verificarSessao, async function (req, res, next)
 {
   const {quaid, tarid} = req.params;
   verificarQuadro(quaid, global.usucodigo, res);
-  
-  //VERIFICAR TAREFA
+
   const tarefa = await global.banco.buscarTarefaDoQuadro(quaid, tarid);
   if (!tarefa) res.redirect('/boards');
 
@@ -421,7 +411,7 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
         nome: usuario.usunome,
         quadrosUsuario,
         quadro: null,
-        mensagem: 'Senha atual incorreta. Nenhuma alteração foi realizada.',
+        mensagem: 'Incorrect current password. No changes were made.',
         sucesso: false
       });
     }
@@ -430,22 +420,22 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
 
     if (nome && nome !== usuario.usunome) {
       await global.banco.atualizarNome(usuid, nome);
-      mensagens.push('Nome atualizado com sucesso!');
+      mensagens.push('Name updated successfully!');
     }
 
     if (email && email !== usuario.usuemail) {
       await global.banco.atualizarEmail(usuid, email);
-      mensagens.push('E-mail atualizado com sucesso!');
+      mensagens.push('E-mail updated successfully!');
     }
 
     if (senha) {
       await global.banco.atualizarSenha(usuid, senha);
-      mensagens.push('Senha atualizada com sucesso!');
+      mensagens.push('Password updated successfully!');
     }
 
     if (bio !== undefined && bio !== usuario.usubio) {
       await global.banco.atualizarBio(usuid, bio)
-      mensagens.push('Biografia atualizada com sucesso!')
+      mensagens.push('Biography updated successfully!')
     }
 
     const usuarioAtualizado = await global.banco.buscarUsuarioPorId(usuid);
@@ -455,7 +445,7 @@ router.post('/perfil/atualizar', verificarSessao, async function(req, res, next)
       nome: usuarioAtualizado.usunome,
       quadrosUsuario,
       quadro: null,
-      mensagem: mensagens.length ? mensagens.join(' ') : 'Nenhuma alteração realizada.',
+      mensagem: mensagens.length ? mensagens.join(' ') : 'No changes were made.',
       sucesso: true
     });
 });
